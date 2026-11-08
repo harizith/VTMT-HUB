@@ -31,18 +31,17 @@ export default async function Home() {
   return (
     <div className="auth">
       <section className="auth-hero" aria-label="About VM-HUB">
+        {/* Floating Top-Right Campus Clock */}
+        <div className="auth-hero-clock-fixed" aria-hidden="true">
+          <Clock size={150} subtext="CAMPUS" />
+        </div>
+
         <div className="auth-brand">
           <span className="shell-logo" aria-hidden="true">VM</span>
           VM-HUB
         </div>
 
-        {/* Headline row with Clock placed on its right side */}
-        <div className="auth-headline-row">
-          <h1 className="auth-headline">Your timetable, attendance and notices in one place.</h1>
-          <div className="auth-clock-inline" aria-hidden="true">
-            <Clock size={160} subtext="CAMPUS" />
-          </div>
-        </div>
+        <h1 className="auth-headline">Your timetable, attendance and notices in one place.</h1>
 
         <p className="auth-lede">
           Sign in with your college account to see today&apos;s periods, mark attendance and read
