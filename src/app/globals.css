@@ -1342,6 +1342,23 @@ html, body {
   flex-direction: column;
   justify-content: center;
   gap: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+}
+
+.auth-clock-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .auth-brand {

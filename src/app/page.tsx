@@ -1,4 +1,5 @@
 import LoginForm from "@/components/LoginForm";
+import Clock from "@/components/Clock";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -30,10 +31,17 @@ export default async function Home() {
   return (
     <div className="auth">
       <section className="auth-hero" aria-label="About VM-HUB">
-        <div className="auth-brand">
-          <span className="shell-logo" aria-hidden="true">VM</span>
-          VM-HUB
+        {/* Top Header Row with Logo and Campus Clock */}
+        <div className="auth-hero-top">
+          <div className="auth-brand">
+            <span className="shell-logo" aria-hidden="true">VM</span>
+            VM-HUB
+          </div>
+          <div className="auth-clock-slot">
+            <Clock size={160} subtext="CAMPUS" />
+          </div>
         </div>
+
         <h1 className="auth-headline">Your timetable, attendance and notices in one place.</h1>
         <p className="auth-lede">
           Sign in with your college account to see today&apos;s periods, mark attendance and read
