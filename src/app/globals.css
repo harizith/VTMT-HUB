@@ -1392,17 +1392,24 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 24px;
+  gap: 28px;
   position: relative;
   overflow: hidden;
 }
 
-.auth-clock-center-wrap {
+.auth-headline-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+}
+
+.auth-clock-inline {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 4px 0;
-  width: 100%;
 }
 
 .auth-brand {

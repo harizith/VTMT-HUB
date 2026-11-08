@@ -36,11 +36,12 @@ export default async function Home() {
           VM-HUB
         </div>
 
-        <h1 className="auth-headline">Your timetable, attendance and notices in one place.</h1>
-
-        {/* Centered Clock between Headline and Lede description */}
-        <div className="auth-clock-center-wrap" aria-hidden="true">
-          <Clock size={160} subtext="CAMPUS" />
+        {/* Headline row with Clock placed on its right side */}
+        <div className="auth-headline-row">
+          <h1 className="auth-headline">Your timetable, attendance and notices in one place.</h1>
+          <div className="auth-clock-inline" aria-hidden="true">
+            <Clock size={160} subtext="CAMPUS" />
+          </div>
         </div>
 
         <p className="auth-lede">
