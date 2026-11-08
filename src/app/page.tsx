@@ -31,14 +31,14 @@ export default async function Home() {
   return (
     <div className="auth">
       <section className="auth-hero" aria-label="About VM-HUB">
-        {/* Top Header Row with Logo and Campus Clock */}
+        {/* Top Header Row with Logo and Large Campus Clock */}
         <div className="auth-hero-top">
           <div className="auth-brand">
             <span className="shell-logo" aria-hidden="true">VM</span>
             VM-HUB
           </div>
           <div className="auth-clock-slot">
-            <Clock size={160} subtext="CAMPUS" />
+            <Clock size={280} subtext="CAMPUS" />
           </div>
         </div>
 

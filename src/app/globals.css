@@ -3,26 +3,34 @@
 @tailwind utilities;
 
 /* === Theme Color Tokens (LinkedIn Professional Modern) === */
-:root, [data-theme="light"] {
+:root,
+[data-theme="light"] {
   /* LinkedIn Signature Blue */
   --royal-blue: #0a66c2;
   --royal-blue-hover: #004182;
   --sky-blue: #70b5f9;
   --sky-blue-hover: #378fe9;
   --white-blue: #f3f2ef;
-  
+
   /* LinkedIn Light Canvas (Default) */
-  --bg-page: #f4f2ee;           /* Warm neutral canvas */
-  --bg-card: #ffffff;           /* Clean White Cards */
+  --bg-page: #f4f2ee;
+  /* Warm neutral canvas */
+  --bg-card: #ffffff;
+  /* Clean White Cards */
   --bg-card-header: #f8fafc;
-  --bg-input: #edf3f8;          /* LinkedIn Search/Input Tint */
+  --bg-input: #edf3f8;
+  /* LinkedIn Search/Input Tint */
   --bg-hover: #ebebeb;
-  
-  --text-main: #181818;         /* High Contrast Charcoal */
-  --text-muted: #56687a;        /* LinkedIn Gray Subtitle */
-  --border-subtle: #e0e0e0;     /* LinkedIn Subtle Divider */
-  --border-active: #0a66c2;     /* LinkedIn Active Blue */
-  
+
+  --text-main: #181818;
+  /* High Contrast Charcoal */
+  --text-muted: #56687a;
+  /* LinkedIn Gray Subtitle */
+  --border-subtle: #e0e0e0;
+  /* LinkedIn Subtle Divider */
+  --border-active: #0a66c2;
+  /* LinkedIn Active Blue */
+
   --shadow-card: 0 0 0 1px rgba(140, 140, 140, 0.2), 0 2px 3px rgba(0, 0, 0, 0.05);
   --font-sans: var(--font-source-sans), 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-serif: var(--font-sans);
@@ -38,17 +46,19 @@
 
 /* Dark Theme Overrides (LinkedIn Dark Professional) */
 [data-theme="dark"] {
-  --bg-page: #1b1f23;           /* LinkedIn Dark Body */
-  --bg-card: #24292e;           /* LinkedIn Dark Card/Surface */
+  --bg-page: #1b1f23;
+  /* LinkedIn Dark Body */
+  --bg-card: #24292e;
+  /* LinkedIn Dark Card/Surface */
   --bg-card-header: #2f363d;
   --bg-input: #1b1f23;
   --bg-hover: #32383f;
-  
+
   --text-main: #ffffff;
   --text-muted: #8b949e;
   --border-subtle: #30363d;
   --border-active: #0a66c2;
-  
+
   --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -58,7 +68,8 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: var(--font-sans);
   background-color: var(--bg-page);
@@ -235,7 +246,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));
 }
 
 .clock-text {
@@ -377,7 +388,9 @@ html, body {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .login-footer-text {
@@ -536,8 +549,15 @@ html, body {
 }
 
 @keyframes modalSlideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 768px) {
@@ -564,7 +584,7 @@ html, body {
     align-items: center;
     gap: 0;
   }
-  
+
   .admin-header-top {
     align-items: center;
   }
@@ -742,7 +762,7 @@ html, body {
   right: -10%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -797,7 +817,7 @@ html, body {
 
 .period-card.active .period-time,
 .period-card.active .period-number {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .period-number {
@@ -835,7 +855,7 @@ html, body {
   .student-layout {
     flex-direction: column;
   }
-  
+
   .student-sidebar {
     width: 100%;
     height: 60px;
@@ -848,15 +868,15 @@ html, body {
     z-index: 50;
     justify-content: space-between;
   }
-  
-  .student-sidebar > div:first-child > div:first-child {
+
+  .student-sidebar>div:first-child>div:first-child {
     display: none;
   }
 
   .student-nav-group {
     flex-direction: row;
   }
-  
+
   .student-nav-item {
     margin-bottom: 0;
     margin-right: 0.5rem;
@@ -865,11 +885,11 @@ html, body {
     width: 48px;
     height: 48px;
   }
-  
+
   .student-nav-item span {
     display: none;
   }
-  
+
   .student-nav-bottom {
     flex-direction: row;
     margin-top: 0;
@@ -877,14 +897,15 @@ html, body {
     padding-top: 0;
     border-top: none;
   }
-  
+
   .student-nav-bottom .profile-card {
     display: none;
   }
-  
+
   .student-main {
     padding: 1.5rem;
-    padding-bottom: 80px; /* Space for bottom nav */
+    padding-bottom: 80px;
+    /* Space for bottom nav */
   }
 }
 
@@ -1038,9 +1059,17 @@ html, body {
   padding: 3px 6px 3px 3px;
 }
 
-.shell-theme-btn .icon-for-dark { display: none; }
-[data-theme="dark"] .shell-theme-btn .icon-for-dark { display: block; }
-[data-theme="dark"] .shell-theme-btn .icon-for-light { display: none; }
+.shell-theme-btn .icon-for-dark {
+  display: none;
+}
+
+[data-theme="dark"] .shell-theme-btn .icon-for-dark {
+  display: block;
+}
+
+[data-theme="dark"] .shell-theme-btn .icon-for-light {
+  display: none;
+}
 
 .shell-avatar-caret {
   font-size: 0.65rem;
@@ -1131,8 +1160,15 @@ html, body {
 }
 
 @keyframes menuIn {
-  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Body grid */
@@ -1241,8 +1277,15 @@ html, body {
 }
 
 @keyframes pageIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Cards inside pages pick up the same surface treatment */
@@ -1262,24 +1305,29 @@ html, body {
     grid-template-columns: minmax(0, 1fr);
     padding-top: 16px;
   }
+
   .shell-side {
     display: none;
   }
 }
 
 @media (max-width: 760px) {
+
   .shell-tabs,
   .shell-brand-text small {
     display: none;
   }
+
   .shell-actions {
     margin-left: auto;
     border-left: none;
     padding-left: 0;
   }
+
   .shell-body {
     padding-bottom: 88px;
   }
+
   .shell-bottombar {
     display: flex;
     position: fixed;
@@ -1291,6 +1339,7 @@ html, body {
     box-shadow: 0 -1px 0 var(--border-subtle);
     padding-bottom: env(safe-area-inset-bottom);
   }
+
   .shell-bottom-tab {
     flex: 1;
     min-width: 0;
@@ -1305,12 +1354,14 @@ html, body {
     text-decoration: none;
     border-top: 2px solid transparent;
   }
+
   .shell-bottom-tab span {
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
   .shell-bottom-tab.active {
     color: var(--royal-blue);
     border-top-color: var(--royal-blue);
@@ -1348,7 +1399,7 @@ html, body {
 
 .auth-hero-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
   gap: 20px;
@@ -1359,6 +1410,8 @@ html, body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-top: -16px;
+  margin-right: -10px;
 }
 
 .auth-brand {
@@ -1429,8 +1482,16 @@ html, body {
 }
 
 @keyframes periodIn {
-  from { opacity: 0; transform: scale(0.6); background: rgba(255, 255, 255, 0.1); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .auth-panel {
@@ -1476,8 +1537,13 @@ html, body {
 }
 
 @keyframes shake {
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+  25% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
 }
 
 .auth-field {
@@ -1600,14 +1666,17 @@ html, body {
   .auth {
     grid-template-columns: minmax(0, 1fr);
   }
+
   .auth-hero {
     padding: 28px 20px;
     gap: 20px;
   }
+
   .auth-lede,
   .auth-week {
     display: none;
   }
+
   .auth-headline {
     max-width: none;
     font-size: 1.6rem;
@@ -1615,6 +1684,7 @@ html, body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .shell-content,
   .shell-menu,
   .auth-card,
@@ -1622,6 +1692,7 @@ html, body {
   .auth-week-cell.filled {
     animation: none;
   }
+
   .shell-tab::after,
   .shell-tab,
   .auth-input,
