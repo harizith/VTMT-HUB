@@ -1,0 +1,3 @@
+- [VM-HUB Replit setup quirks](vm-hub-replit-setup.md) — Web preview needs port 5000 forwarded to external 80, plus allowed origins for Next.js HMR.
+- [Timetable import integrity](timetable-import-integrity.md) — Only store timetable values actually present in source data; never fill missing PDF fields from a canned schedule.
+- [Timetable & Staff Allocation Architecture](timetable-staff-allocation-architecture.md) — Keep Timetable and Teacher Staff Allocation unified as a single sidebar option; retain per-class allocation persistence and User authentication mappings.

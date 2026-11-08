@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  FACULTY
+  HOD
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  vmNo      String?  @unique // Real VM NO (e.g. 17433, EMP-CSE-001)
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(STUDENT)
+  status    String   @default("ACTIVE") // ACTIVE, SUSPENDED, PENDING
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile StudentProfile?
+  facultyProfile FacultyProfile?
+  hodProfile     HodProfile?
+  auditLogs      AuditLog[]
+  notices        Notice[]
+}
+
+model UserMode {
+  vmno      String   @id
+  emailid   String   @unique
+  password  String
+  usermode  String
+  createdAt DateTime @default(now())
+}
+
+model StudentProfile {
+  userEmail   String     @id
+  user        User       @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+  rollNumber  String?    @unique
+  department  String?
+  dept        Department? @relation(fields: [department], references: [code], onDelete: SetNull)
+  semester    Int?
+  batch       String?
+  year        String?
+  section     String?
+  createdAt   DateTime   @default(now())
+}
+
+model FacultyProfile {
+  vmNo        String     @id
+  user        User       @relation(fields: [vmNo], references: [vmNo], onDelete: Cascade)
+  department  String?
+  dept        Department? @relation(fields: [department], references: [code], onDelete: SetNull)
+  designation String?
+  subject1    String?
+  subject2    String?
+  lab1        String?
+  lab2        String?
+  additional1 String?
+  additional2 String?
+  createdAt   DateTime   @default(now())
+}
+
+model HodProfile {
+  vmNo        String     @id
+  user        User       @relation(fields: [vmNo], references: [vmNo], onDelete: Cascade)
+  department  String?
+  dept        Department? @relation(fields: [department], references: [code], onDelete: SetNull)
+  designation String?
+  createdAt   DateTime   @default(now())
+}
+
+model Department {
+  id              String           @id @default(uuid())
+  code            String           @unique // e.g. CSE, ECE, MECH
+  name            String           // e.g. Computer Science and Engineering
+  hodName         String?  
+  createdAt       DateTime         @default(now())
+
+  subjects        Subject[]
+  studentProfiles StudentProfile[]
+  facultyProfiles FacultyProfile[]
+  hodProfiles     HodProfile[]
+}
+
+model Subject {
+  id             String     @id @default(uuid())
+  code           String     @unique // Subject code
+  name           String     // e.g. Computer Networks
+  credits        Int        @default(3)
+  semester       Int        @default(5)
+  departmentCode String     @default("CSE")
+  department     Department @relation(fields: [departmentCode], references: [code], onDelete: Cascade)
+  createdAt      DateTime   @default(now())
+}
+
+model Notice {
+  id              String   @id @default(uuid())
+  title           String
+  content         String
+  category        String   @default("GENERAL") // GENERAL, URGENT, EXAM
+  audience        String   @default("ALL") // ALL, STUDENT, FACULTY, SPECIFIC_STUDENT
+  targetStudentId String?  // Specific student ID / Roll No / Email
+  department      String?  // Optional department filter
+  postedBy        String   @default("Admin")
+  authorId        String?
+  author          User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+
+  @@index([postedBy])
+  @@index([targetStudentId])
+}
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  details     String
+  performedBy String   @default("Admin")
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+}
+
+model TimetableEntry {
+  id           String   @id @default(uuid())
+  classId      String?  // e.g., "IICSEA"
+  dayOrder     String?  // e.g., "I", "II", "III", "IV", "V"
+  period       Int?     // 1 to 8
+  timeRange    String?
+  subjectCode  String?
+  subjectName  String?
+  facultyName  String?
+  roomNo       String?
+  vmsNo        String?
+  category     String?  // sub1, sub2, sub3, lab1, lab2, pe, oe, additional1, additional2
+  academicYear String?  // e.g. "2026-2027"
+  semType      String?  // "ODD" or "EVEN"
+  createdAt    DateTime @default(now())
+  
+  @@index([classId, dayOrder])
+  @@index([vmsNo])
+  @@index([academicYear])
+}
+
+model TimetableHistory {
+  id           String   @id @default(uuid())
+  classId      String?  // e.g., "II-CSE-A"
+  academicYear String?  // e.g., "2026-2027"
+  year         Int?     // 1, 2, 3, 4
+  semType      String?  // "ODD" or "EVEN"
+  dayOrder     String?
+  period       Int?
+  timeRange    String?
+  subjectCode  String?
+  subjectName  String?
+  facultyName  String?
+  roomNo       String?
+  vmsNo        String?
+  category     String?
+
+  @@index([classId, academicYear])
+  @@index([year, semType])
+}
+
+model Attendance {
+  id          String   @id @default(uuid())
+  studentId   String   // VM No or Email
+  classId     String   // e.g., "IICSEA"
+  dateString  String   // e.g., "2026-10-02"
+  dayOrder    String
+  period      Int
+  subjectCode String
+  facultyName String
+  status      String   @default("PRESENT") // PRESENT, ABSENT, ON_DUTY
+  createdAt   DateTime @default(now())
+
+  @@unique([studentId, dateString, period])
+  @@index([classId, dateString])
+}
+
