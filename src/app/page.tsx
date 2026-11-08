@@ -31,15 +31,14 @@ export default async function Home() {
   return (
     <div className="auth">
       <section className="auth-hero" aria-label="About VM-HUB">
-        {/* Top Header Row with Logo and Large Campus Clock */}
-        <div className="auth-hero-top">
-          <div className="auth-brand">
-            <span className="shell-logo" aria-hidden="true">VM</span>
-            VM-HUB
-          </div>
-          <div className="auth-clock-slot">
-            <Clock size={280} subtext="CAMPUS" />
-          </div>
+        {/* Floating Background/Watermark Clock (Huge size, does not push or zoom any content) */}
+        <div className="auth-hero-clock-bg" aria-hidden="true">
+          <Clock size={360} subtext="CAMPUS" />
+        </div>
+
+        <div className="auth-brand">
+          <span className="shell-logo" aria-hidden="true">VM</span>
+          VM-HUB
         </div>
 
         <h1 className="auth-headline">Your timetable, attendance and notices in one place.</h1>

@@ -1397,21 +1397,18 @@ body {
   overflow: hidden;
 }
 
-.auth-hero-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  width: 100%;
-  gap: 20px;
+.auth-hero-clock-bg {
+  position: absolute;
+  top: 15px;
+  right: -20px;
+  opacity: 0.95;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.auth-clock-slot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: -16px;
-  margin-right: -10px;
+.auth-hero > *:not(.auth-hero-clock-bg) {
+  position: relative;
+  z-index: 2;
 }
 
 .auth-brand {
