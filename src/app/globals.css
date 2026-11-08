@@ -1400,13 +1400,13 @@ body {
 .auth-headline-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: flex-start;
+  gap: 36px;
   width: 100%;
 }
 
 .auth-clock-inline {
-  flex-shrink: 0;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
