@@ -1397,14 +1397,6 @@ body {
   overflow: hidden;
 }
 
-.auth-hero-clock-fixed {
-  position: absolute;
-  top: 48px;
-  right: clamp(28px, 4vw, 64px);
-  z-index: 5;
-  pointer-events: none;
-}
-
 .auth-brand {
   display: flex;
   align-items: center;

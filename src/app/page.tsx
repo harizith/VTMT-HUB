@@ -1,5 +1,4 @@
 import LoginForm from "@/components/LoginForm";
-import Clock from "@/components/Clock";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -31,11 +30,6 @@ export default async function Home() {
   return (
     <div className="auth">
       <section className="auth-hero" aria-label="About VM-HUB">
-        {/* Floating Top-Right Campus Clock */}
-        <div className="auth-hero-clock-fixed" aria-hidden="true">
-          <Clock size={150} subtext="CAMPUS" />
-        </div>
-
         <div className="auth-brand">
           <span className="shell-logo" aria-hidden="true">VM</span>
           VM-HUB
