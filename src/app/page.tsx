@@ -31,9 +31,9 @@ export default async function Home() {
   return (
     <div className="auth">
       <section className="auth-hero" aria-label="About VM-HUB">
-        {/* Floating Background/Watermark Clock (Huge size, does not push or zoom any content) */}
+        {/* Elegant top-right Campus Clock */}
         <div className="auth-hero-clock-bg" aria-hidden="true">
-          <Clock size={360} subtext="CAMPUS" />
+          <Clock size={160} subtext="CAMPUS" />
         </div>
 
         <div className="auth-brand">

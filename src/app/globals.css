@@ -1399,9 +1399,9 @@ body {
 
 .auth-hero-clock-bg {
   position: absolute;
-  top: 15px;
-  right: -20px;
-  opacity: 0.95;
+  top: 36px;
+  right: clamp(24px, 4vw, 56px);
+  opacity: 1;
   pointer-events: none;
   z-index: 1;
 }
