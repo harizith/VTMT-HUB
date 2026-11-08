@@ -17,7 +17,7 @@ export default function HodLayout({ children }: { children: React.ReactNode }) {
           setHodInfo(res.data.hod || res.data.teacher);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const navItems = [
@@ -25,7 +25,7 @@ export default function HodLayout({ children }: { children: React.ReactNode }) {
     { href: "/hod/department", label: "Department Overview", shortLabel: "Department", Icon: Briefcase },
     { href: "/hod/courses", label: "Department Courses", shortLabel: "Courses", Icon: BookOpen },
     { href: "/hod/faculty", label: "Faculty Directory", shortLabel: "Faculty", Icon: Users },
-    { href: "/teacher/students", label: "Take Attendance (Teaching)", shortLabel: "Attendance", Icon: Calendar },
+    { href: "/teacher/attendance", label: "Take Attendance (Teaching)", shortLabel: "Attendance", Icon: Calendar },
     { href: "/hod/notices", label: "Announcements", shortLabel: "Notices", Icon: Bell },
   ];
 

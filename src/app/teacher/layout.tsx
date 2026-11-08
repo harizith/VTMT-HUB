@@ -22,8 +22,9 @@ export default function TeacherLayout({ children }: { children: React.ReactNode 
 
   const navItems = [
     { href: "/teacher", label: "Dashboard", Icon: Home },
-    { href: "/teacher/students", label: "Attendance & Students", shortLabel: "Students", Icon: Users },
+    { href: "/teacher/attendance", label: "Attendance Ledger", shortLabel: "Attendance", Icon: Users },
     { href: "/teacher/courses", label: "Course Allocations", shortLabel: "Courses", Icon: BookOpen },
+    { href: "/teacher/schedule", label: "Schedule", shortLabel: "Timetable", Icon: Users },
     { href: "/teacher/notices", label: "Announcements", Icon: Bell },
   ];
 
