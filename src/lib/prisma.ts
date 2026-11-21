@@ -60,10 +60,36 @@ class InMemoryStore {
       updatedAt: new Date(),
     };
 
-    this.users = [secretAdmin, studentUser];
+    const teacherUser = {
+      id: "fac-vtmt-emp01",
+      vmNo: "EMP-CSE-001",
+      email: "teacher@vtmt.org",
+      name: "Dr. Saravanan",
+      password: "teacher123",
+      role: "TEACHER",
+      status: "ACTIVE",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const hodUser = {
+      id: "hod-vtmt-cse",
+      vmNo: "HOD-CSE-01",
+      email: "hod@vtmt.org",
+      name: "Dr. Saravanan (HOD)",
+      password: "hod123",
+      role: "HOD",
+      status: "ACTIVE",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.users = [secretAdmin, studentUser, teacherUser, hodUser];
     this.userModes = [
       { vmno: "ADM-SECRET-01", emailid: "admin@vtmt.org", password: "administrator", usermode: "ADMIN", createdAt: new Date() },
       { vmno: "23CS101", emailid: "student@vtmt.org", password: "student123", usermode: "STUDENT", createdAt: new Date() },
+      { vmno: "EMP-CSE-001", emailid: "teacher@vtmt.org", password: "teacher123", usermode: "TEACHER", createdAt: new Date() },
+      { vmno: "HOD-CSE-01", emailid: "hod@vtmt.org", password: "hod123", usermode: "HOD", createdAt: new Date() },
     ];
     this.studentProfiles = [
       {
@@ -77,8 +103,24 @@ class InMemoryStore {
         createdAt: new Date(),
       },
     ];
-    this.facultyProfiles = [];
-    this.hodProfiles = [];
+    this.facultyProfiles = [
+      {
+        userEmail: "teacher@vtmt.org",
+        department: "CSE",
+        designation: "Associate Professor",
+        cabin: "N-201",
+        createdAt: new Date(),
+      },
+    ];
+    this.hodProfiles = [
+      {
+        userEmail: "hod@vtmt.org",
+        department: "CSE",
+        designation: "Head of Department",
+        cabin: "HOD-CSE-Cabin",
+        createdAt: new Date(),
+      },
+    ];
 
     // 3. Subjects - Synced with Institutional Curriculum
     this.subjects = [
