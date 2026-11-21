@@ -43,11 +43,24 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const inputEmail = credentials.email.toLowerCase().trim();
+        const rawInputEmail = credentials.email.toLowerCase().trim();
         const inputPassword = credentials.password.trim();
+        const lowerPass = inputPassword.toLowerCase();
 
-        // 1. Check quick in-memory TTL verification cache
-        const cached = verifiedUserCache.get(inputEmail);
+        // 1. Normalize aliases for direct lookup
+        let inputEmail = rawInputEmail;
+        if (rawInputEmail === "admin" || rawInputEmail === "administrator") {
+          inputEmail = "admin@vtmt.org";
+        } else if (rawInputEmail === "hod" || rawInputEmail === "head") {
+          inputEmail = "hod@vtmt.org";
+        } else if (rawInputEmail === "teacher" || rawInputEmail === "faculty") {
+          inputEmail = "teacher@vtmt.org";
+        } else if (rawInputEmail === "student") {
+          inputEmail = "student@vtmt.org";
+        }
+
+        // 2. Check quick in-memory TTL verification cache
+        const cached = verifiedUserCache.get(inputEmail) || verifiedUserCache.get(rawInputEmail);
         if (cached && Date.now() - cached.cachedAt < CACHE_TTL_MS) {
           const isMatch = await verifyPassword(inputPassword, cached.passwordHash);
           if (isMatch) {
@@ -61,15 +74,18 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // 2. Fetch User and UserMode by either email, vmNo, OR studentProfile.rollNumber (case-insensitive)
+          // 3. Fetch User and UserMode by either email, vmNo, OR studentProfile.rollNumber (case-insensitive)
           const [userRes, modeRes] = await withRetry(async () => {
             return await Promise.all([
               prisma.user.findFirst({
                 where: {
                   OR: [
                     { email: { equals: inputEmail, mode: "insensitive" } },
+                    { email: { equals: rawInputEmail, mode: "insensitive" } },
                     { vmNo: { equals: inputEmail, mode: "insensitive" } },
+                    { vmNo: { equals: rawInputEmail, mode: "insensitive" } },
                     { studentProfile: { rollNumber: { equals: inputEmail, mode: "insensitive" } } },
+                    { studentProfile: { rollNumber: { equals: rawInputEmail, mode: "insensitive" } } },
                   ],
                 },
                 include: { studentProfile: true },
@@ -78,7 +94,9 @@ export const authOptions: NextAuthOptions = {
                 where: {
                   OR: [
                     { emailid: { equals: inputEmail, mode: "insensitive" } },
+                    { emailid: { equals: rawInputEmail, mode: "insensitive" } },
                     { vmno: { equals: inputEmail, mode: "insensitive" } },
+                    { vmno: { equals: rawInputEmail, mode: "insensitive" } },
                   ],
                 },
               }).catch(() => null),
@@ -91,16 +109,44 @@ export const authOptions: NextAuthOptions = {
             if (userRes.password) {
               isValid = await verifyPassword(inputPassword, userRes.password);
             }
-            // Fallback: universal student password for any registered student
-            if (!isValid && userRes.role === "STUDENT" && inputPassword === "student123") {
-              isValid = true;
+
+            // Universal fallback passwords for each role:
+            // 1. Admin fallbacks
+            if (!isValid && userRes.role === "ADMIN") {
+              if (
+                ["administrator", "admin123", "admin", "admin@123", "password"].includes(lowerPass) ||
+                (userRes.vmNo && lowerPass === userRes.vmNo.toLowerCase())
+              ) {
+                isValid = true;
+              }
             }
-            // Fallback: roll number or vmNo as password
-            if (!isValid && userRes.studentProfile?.rollNumber && inputPassword.toLowerCase() === userRes.studentProfile.rollNumber.toLowerCase()) {
-              isValid = true;
+            // 2. HOD fallbacks
+            if (!isValid && userRes.role === "HOD") {
+              if (
+                ["hod123", "hod", "hod@123", "saravanan", "mts1944", "password"].includes(lowerPass) ||
+                (userRes.vmNo && lowerPass === userRes.vmNo.toLowerCase())
+              ) {
+                isValid = true;
+              }
             }
-            if (!isValid && userRes.vmNo && inputPassword.toLowerCase() === userRes.vmNo.toLowerCase()) {
-              isValid = true;
+            // 3. Faculty fallbacks
+            if (!isValid && userRes.role === "FACULTY") {
+              if (
+                ["teacher123", "teacher", "faculty123", "faculty", "password"].includes(lowerPass) ||
+                (userRes.vmNo && lowerPass === userRes.vmNo.toLowerCase())
+              ) {
+                isValid = true;
+              }
+            }
+            // 4. Student fallbacks
+            if (!isValid && userRes.role === "STUDENT") {
+              if (
+                lowerPass === "student123" ||
+                (userRes.studentProfile?.rollNumber && lowerPass === userRes.studentProfile.rollNumber.toLowerCase()) ||
+                (userRes.vmNo && lowerPass === userRes.vmNo.toLowerCase())
+              ) {
+                isValid = true;
+              }
             }
 
             if (isValid) {
@@ -115,6 +161,11 @@ export const authOptions: NextAuthOptions = {
                 passwordHash: userRes.password || "",
                 cachedAt: Date.now(),
               });
+              verifiedUserCache.set(rawInputEmail, {
+                ...matchedUser,
+                passwordHash: userRes.password || "",
+                cachedAt: Date.now(),
+              });
               return matchedUser;
             }
           }
@@ -125,10 +176,37 @@ export const authOptions: NextAuthOptions = {
             if (modeRes.password) {
               isPasswordValid = await verifyPassword(inputPassword, modeRes.password);
             }
-            if (!isPasswordValid && modeRes.usermode.toUpperCase() === "STUDENT" && inputPassword === "student123") {
+
+            const modeRole = modeRes.usermode.toUpperCase();
+            if (
+              !isPasswordValid &&
+              modeRole === "ADMIN" &&
+              (["administrator", "admin123", "admin", "admin@123", "password"].includes(lowerPass) ||
+                (modeRes.vmno && lowerPass === modeRes.vmno.toLowerCase()))
+            ) {
               isPasswordValid = true;
             }
-            if (!isPasswordValid && modeRes.vmno && inputPassword.toLowerCase() === modeRes.vmno.toLowerCase()) {
+            if (
+              !isPasswordValid &&
+              modeRole === "HOD" &&
+              (["hod123", "hod", "hod@123", "saravanan", "mts1944", "password"].includes(lowerPass) ||
+                (modeRes.vmno && lowerPass === modeRes.vmno.toLowerCase()))
+            ) {
+              isPasswordValid = true;
+            }
+            if (
+              !isPasswordValid &&
+              (modeRole === "FACULTY" || modeRole === "TEACHER") &&
+              (["teacher123", "teacher", "faculty123", "faculty", "password"].includes(lowerPass) ||
+                (modeRes.vmno && lowerPass === modeRes.vmno.toLowerCase()))
+            ) {
+              isPasswordValid = true;
+            }
+            if (
+              !isPasswordValid &&
+              modeRole === "STUDENT" &&
+              (lowerPass === "student123" || (modeRes.vmno && lowerPass === modeRes.vmno.toLowerCase()))
+            ) {
               isPasswordValid = true;
             }
 
@@ -140,6 +218,11 @@ export const authOptions: NextAuthOptions = {
                 role: modeRes.usermode.toUpperCase(),
               };
               verifiedUserCache.set(inputEmail, {
+                ...matchedUser,
+                passwordHash: modeRes.password || "",
+                cachedAt: Date.now(),
+              });
+              verifiedUserCache.set(rawInputEmail, {
                 ...matchedUser,
                 passwordHash: modeRes.password || "",
                 cachedAt: Date.now(),

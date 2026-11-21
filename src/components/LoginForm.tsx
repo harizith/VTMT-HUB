@@ -20,13 +20,13 @@ export default function LoginForm() {
     const targetPassword = password.trim();
 
     // Friendly alias mappings
-    if (targetEmail === "student") {
+    if (targetEmail === "student" || targetEmail === "student@veltechmultitech.org") {
       targetEmail = "student@vtmt.org";
-    } else if (targetEmail === "admin") {
+    } else if (targetEmail === "admin" || targetEmail === "administrator" || targetEmail === "admin@veltechmultitech.org") {
       targetEmail = "admin@vtmt.org";
-    } else if (targetEmail === "teacher" || targetEmail === "faculty") {
+    } else if (targetEmail === "teacher" || targetEmail === "faculty" || targetEmail === "teacher@veltechmultitech.org") {
       targetEmail = "teacher@vtmt.org";
-    } else if (targetEmail === "hod") {
+    } else if (targetEmail === "hod" || targetEmail === "head" || targetEmail === "hod@veltechmultitech.org") {
       targetEmail = "hod@vtmt.org";
     }
 
@@ -38,12 +38,38 @@ export default function LoginForm() {
       });
 
       if (res?.ok && !res?.error) {
+        try {
+          const sessionRes = await fetch("/api/auth/session");
+          if (sessionRes.ok) {
+            const sessionData = await sessionRes.json();
+            const role = (sessionData?.user?.role || "").toUpperCase();
+            if (role === "ADMIN") {
+              window.location.href = "/admin";
+              return;
+            }
+            if (role === "HOD") {
+              window.location.href = "/hod";
+              return;
+            }
+            if (role === "FACULTY" || role === "TEACHER") {
+              window.location.href = "/teacher";
+              return;
+            }
+            if (role === "STUDENT") {
+              window.location.href = "/student";
+              return;
+            }
+          }
+        } catch {
+          // fallback
+        }
+
         // Direct role-based routing based on credential identity
         if (targetEmail.includes("admin") || targetEmail.includes("adm")) {
           window.location.href = "/admin";
-        } else if (targetEmail.includes("hod")) {
+        } else if (targetEmail.includes("hod") || targetEmail.includes("saravanan")) {
           window.location.href = "/hod";
-        } else if (targetEmail.includes("teacher") || targetEmail.includes("emp")) {
+        } else if (targetEmail.includes("teacher") || targetEmail.includes("emp") || targetEmail.includes("mts")) {
           window.location.href = "/teacher";
         } else {
           window.location.href = "/student";
