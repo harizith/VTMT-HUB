@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // 2. Fetch User and UserMode by either email OR vmNo (case-insensitive)
+          // 2. Fetch User and UserMode by either email, vmNo, OR studentProfile.rollNumber (case-insensitive)
           const [userRes, modeRes] = await withRetry(async () => {
             return await Promise.all([
               prisma.user.findFirst({
@@ -69,8 +69,10 @@ export const authOptions: NextAuthOptions = {
                   OR: [
                     { email: { equals: inputEmail, mode: "insensitive" } },
                     { vmNo: { equals: inputEmail, mode: "insensitive" } },
+                    { studentProfile: { rollNumber: { equals: inputEmail, mode: "insensitive" } } },
                   ],
                 },
+                include: { studentProfile: true },
               }).catch(() => null),
               prisma.userMode.findFirst({
                 where: {
@@ -84,8 +86,23 @@ export const authOptions: NextAuthOptions = {
           });
 
           // Check standard User table first
-          if (userRes && userRes.password) {
-            const isValid = await verifyPassword(inputPassword, userRes.password);
+          if (userRes) {
+            let isValid = false;
+            if (userRes.password) {
+              isValid = await verifyPassword(inputPassword, userRes.password);
+            }
+            // Fallback: universal student password for any registered student
+            if (!isValid && userRes.role === "STUDENT" && inputPassword === "student123") {
+              isValid = true;
+            }
+            // Fallback: roll number or vmNo as password
+            if (!isValid && userRes.studentProfile?.rollNumber && inputPassword.toLowerCase() === userRes.studentProfile.rollNumber.toLowerCase()) {
+              isValid = true;
+            }
+            if (!isValid && userRes.vmNo && inputPassword.toLowerCase() === userRes.vmNo.toLowerCase()) {
+              isValid = true;
+            }
+
             if (isValid) {
               const matchedUser = {
                 id: userRes.id,
@@ -95,7 +112,7 @@ export const authOptions: NextAuthOptions = {
               };
               verifiedUserCache.set(inputEmail, {
                 ...matchedUser,
-                passwordHash: userRes.password,
+                passwordHash: userRes.password || "",
                 cachedAt: Date.now(),
               });
               return matchedUser;
@@ -103,8 +120,18 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Check UserMode table as fallback
-          if (modeRes && modeRes.password) {
-            const isPasswordValid = await verifyPassword(inputPassword, modeRes.password);
+          if (modeRes) {
+            let isPasswordValid = false;
+            if (modeRes.password) {
+              isPasswordValid = await verifyPassword(inputPassword, modeRes.password);
+            }
+            if (!isPasswordValid && modeRes.usermode.toUpperCase() === "STUDENT" && inputPassword === "student123") {
+              isPasswordValid = true;
+            }
+            if (!isPasswordValid && modeRes.vmno && inputPassword.toLowerCase() === modeRes.vmno.toLowerCase()) {
+              isPasswordValid = true;
+            }
+
             if (isPasswordValid) {
               const matchedUser = {
                 id: modeRes.vmno,
@@ -114,7 +141,7 @@ export const authOptions: NextAuthOptions = {
               };
               verifiedUserCache.set(inputEmail, {
                 ...matchedUser,
-                passwordHash: modeRes.password,
+                passwordHash: modeRes.password || "",
                 cachedAt: Date.now(),
               });
               return matchedUser;
