@@ -474,6 +474,11 @@ function getPooledDatabaseUrl(): string | undefined {
 
   try {
     const url = new URL(rawUrl);
+    // Auto-route Supabase pooler to transaction mode (port 6543) for serverless environments
+    if (url.host.includes("pooler.supabase.com") && url.port === "5432") {
+      url.port = "6543";
+      url.searchParams.set("pgbouncer", "true");
+    }
     if (!url.searchParams.has("connection_limit")) {
       url.searchParams.set("connection_limit", "3");
     }

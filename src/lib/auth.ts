@@ -49,13 +49,34 @@ export const authOptions: NextAuthOptions = {
 
         // 1. Normalize aliases for direct lookup
         let inputEmail = rawInputEmail;
-        if (rawInputEmail === "admin" || rawInputEmail === "administrator") {
+        if (
+          rawInputEmail === "admin" ||
+          rawInputEmail === "administrator" ||
+          rawInputEmail.startsWith("admin@") ||
+          rawInputEmail.startsWith("admin.") ||
+          rawInputEmail === "adm-secret-01" ||
+          rawInputEmail === "adm-secret-02"
+        ) {
           inputEmail = "admin@vtmt.org";
-        } else if (rawInputEmail === "hod" || rawInputEmail === "head") {
+        } else if (
+          rawInputEmail === "hod" ||
+          rawInputEmail === "head" ||
+          rawInputEmail.startsWith("hod@") ||
+          rawInputEmail.startsWith("hod.") ||
+          rawInputEmail.includes("saravanan") ||
+          rawInputEmail === "hod-cse-01" ||
+          rawInputEmail === "mts1944"
+        ) {
           inputEmail = "hod@vtmt.org";
-        } else if (rawInputEmail === "teacher" || rawInputEmail === "faculty") {
+        } else if (
+          rawInputEmail === "teacher" ||
+          rawInputEmail === "faculty" ||
+          rawInputEmail.startsWith("teacher@") ||
+          rawInputEmail.startsWith("faculty@") ||
+          rawInputEmail === "emp-cse-001"
+        ) {
           inputEmail = "teacher@vtmt.org";
-        } else if (rawInputEmail === "student") {
+        } else if (rawInputEmail === "student" || rawInputEmail.startsWith("student@")) {
           inputEmail = "student@vtmt.org";
         }
 
