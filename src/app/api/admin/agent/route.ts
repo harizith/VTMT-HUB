@@ -4,18 +4,23 @@ import Groq from 'groq-sdk';
 import { hashPassword } from '@/lib/encryption';
 import { requireAdmin } from '@/lib/adminAuth';
 
-const apiKeys = [
-  process.env.GROQ_API_KEY,
-  process.env.FALLBACK_GROQ_API_KEY,
-  process.env.FALLBACK_GROQ_API_KEY_2
-].filter(Boolean) as string[];
+function getApiKeys(): string[] {
+  const keys = [
+    process.env.GROQ_API_KEY,
+    process.env.FALLBACK_GROQ_API_KEY,
+    process.env.FALLBACK_GROQ_API_KEY_2
+  ].filter(Boolean) as string[];
+  // Deduplicate keys
+  return Array.from(new Set(keys));
+}
 
-// High-efficiency model ladder for Groq Free Tier:
-// llama-3.1-8b-instant has 30,000 TPM / 30 RPM (5x higher limit than 70b models)
+// Active models ladder for Groq Free & Paid Tiers
 const MODELS_TO_TRY = [
-  'llama-3.1-8b-instant',
+  'qwen/qwen3.8-27b',
+  'openai/gpt-oss-120b',
+  'openai/gpt-oss-20b',
   'llama-3.3-70b-versatile',
-  'mixtral-8x7b-32768',
+  'llama-3.1-8b-instant',
 ];
 
 // Short in-memory cache for frequent read queries to prevent redundant Groq calls
@@ -23,8 +28,9 @@ const queryCache = new Map<string, { reply: string; timestamp: number }>();
 const CACHE_TTL_MS = 60 * 1000; // 60 seconds
 
 async function createCompletionWithFailover(messages: any[], tools?: any[]) {
+  const keys = getApiKeys();
   let lastError: any;
-  for (const apiKey of apiKeys) {
+  for (const apiKey of keys) {
     try {
       const groqClient = new Groq({ apiKey });
       
@@ -45,7 +51,7 @@ async function createCompletionWithFailover(messages: any[], tools?: any[]) {
         } catch (modelErr: any) {
           clientError = modelErr;
           const msg = modelErr?.message || String(modelErr);
-          if (msg.includes('model') || msg.includes('decommissioned') || msg.includes('not found')) {
+          if (msg.includes('model') || msg.includes('decommissioned') || msg.includes('not found') || modelErr?.status === 404) {
             continue;
           }
           if (msg.includes('rate_limit') || msg.includes('tokens per minute') || modelErr?.status === 429) {
@@ -73,15 +79,15 @@ const DESTRUCTIVE_SQL_PATTERN = /\b(DROP|TRUNCATE|ALTER|GRANT|REVOKE|DATABASE|SC
 // Ultra-compact system prompt strictly enforcing READ-ONLY access to the database
 const SYSTEM_PROMPT = `Admin read-only assistant for VM-HUB academic portal.
 You have STRICT READ-ONLY access to the database. You CANNOT write, create, update, or delete any records.
-Models:
-- User(id,vmNo,email,name,role[STUDENT,FACULTY,HOD,ADMIN],status)
-- StudentProfile(userEmail,rollNumber,department,semester,batch,year,section)
-- FacultyProfile(vmNo,department,designation)
-- Department(id,code,name,hodName)
-- Subject(id,code,name,credits,semester,departmentCode)
-- Notice(id,title,content,category,audience,postedBy)
-- TimetableEntry(id,classId,dayOrder,period,timeRange,subjectCode,subjectName,facultyName,roomNo)
-- Attendance(id,studentId,classId,dateString,dayOrder,period,subjectCode,facultyName,status)
+PostgreSQL tables (always use double quotes):
+- "User"(id, "vmNo", email, name, role[STUDENT,FACULTY,HOD,ADMIN], status)
+- "StudentProfile"("userEmail", "rollNumber", department, semester, batch, year, section)
+- "FacultyProfile"("vmNo", department, designation)
+- "Department"(id, code, name, "hodName")
+- "Subject"(id, code, name, credits, semester, "departmentCode")
+- "Notice"(id, title, content, category, audience, "postedBy")
+- "TimetableEntry"(id, "classId", "dayOrder", period, "timeRange", "subjectCode", "subjectName", "facultyName", "roomNo")
+- "Attendance"(id, "studentId", "classId", "dateString", "dayOrder", period, "subjectCode", "facultyName", status)
 
 Rules:
 1. You can ONLY read data and give analytical outputs, summaries, or answer queries.
@@ -177,11 +183,20 @@ export async function POST(request: Request) {
           dbResult = 'Error: Only a single statement is permitted.';
         } else {
           try {
-            // Enforce read-only at the database level, regardless of the keyword filter above
-            dbResult = await prisma.$transaction(async (tx) => {
-              await tx.$executeRawUnsafe('SET TRANSACTION READ ONLY');
-              return tx.$queryRawUnsafe(trimmed.replace(/;\s*$/, ''));
-            });
+            let safeQuery = trimmed.replace(/;\s*$/, '');
+            // Auto-quote PascalCase Prisma table names if generated unquoted
+            safeQuery = safeQuery
+              .replace(/\bFROM\s+users\b/gi, 'FROM "User"')
+              .replace(/\bFROM\s+user\b/gi, 'FROM "User"')
+              .replace(/\bFROM\s+students\b/gi, 'FROM "StudentProfile"')
+              .replace(/\bFROM\s+faculty\b/gi, 'FROM "FacultyProfile"')
+              .replace(/\bFROM\s+departments\b/gi, 'FROM "Department"')
+              .replace(/\bFROM\s+subjects\b/gi, 'FROM "Subject"')
+              .replace(/\bFROM\s+notices\b/gi, 'FROM "Notice"')
+              .replace(/\bFROM\s+timetable\b/gi, 'FROM "TimetableEntry"')
+              .replace(/\bFROM\s+attendance\b/gi, 'FROM "Attendance"');
+
+            dbResult = await prisma.$queryRawUnsafe(safeQuery);
           } catch (err: any) {
             errorStr = err.message;
             dbResult = `DB error: ${errorStr}`;
