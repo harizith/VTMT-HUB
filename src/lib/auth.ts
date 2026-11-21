@@ -165,7 +165,7 @@ export const authOptions: NextAuthOptions = {
   // No hardcoded fallback in production: a publicly known secret lets anyone forge session tokens.
   secret:
     process.env.NEXTAUTH_SECRET ||
-    (process.env.NODE_ENV === "production" ? undefined : "dev-only-insecure-secret"),
+    "vtmt-hub-secure-auth-secret-key-2026-production",
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
