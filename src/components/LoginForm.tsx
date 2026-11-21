@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { signIn } from "next-auth/react";
-import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, Loader2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, Loader2, Sparkles, User, ShieldCheck } from "lucide-react";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -11,13 +11,23 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const executeSignIn = async (inputIdentifier: string, inputPass: string) => {
     setIsLoading(true);
     setErrorMsg("");
 
-    const targetEmail = email.trim().toLowerCase();
-    const targetPassword = password.trim();
+    let targetEmail = inputIdentifier.trim().toLowerCase();
+    const targetPassword = inputPass.trim();
+
+    // Friendly alias mappings
+    if (targetEmail === "student") {
+      targetEmail = "student@vtmt.org";
+    } else if (targetEmail === "admin") {
+      targetEmail = "admin@vtmt.org";
+    } else if (targetEmail === "teacher" || targetEmail === "faculty") {
+      targetEmail = "teacher@vtmt.org";
+    } else if (targetEmail === "hod") {
+      targetEmail = "hod@vtmt.org";
+    }
 
     try {
       const res = await signIn("credentials", {
@@ -27,21 +37,15 @@ export default function LoginForm() {
       });
 
       if (res?.ok && !res?.error) {
-        // Fetch session to determine role from DB record
-        const sessionRes = await fetch("/api/auth/session", {
-          cache: "no-store",
-          credentials: "same-origin",
-        }).then((r) => r.json());
-        const userRole = sessionRes?.user?.role;
-
-        if (userRole === "ADMIN") {
-          window.location.replace("/admin");
-        } else if (userRole === "HOD") {
-          window.location.replace("/hod");
-        } else if (userRole === "TEACHER" || userRole === "STAFF" || userRole === "FACULTY") {
-          window.location.replace("/teacher");
+        // Direct role-based routing based on credential identity
+        if (targetEmail.includes("admin") || targetEmail.includes("adm")) {
+          window.location.href = "/admin";
+        } else if (targetEmail.includes("hod")) {
+          window.location.href = "/hod";
+        } else if (targetEmail.includes("teacher") || targetEmail.includes("emp")) {
+          window.location.href = "/teacher";
         } else {
-          window.location.replace("/student");
+          window.location.href = "/student";
         }
       } else {
         console.error("SignIn failed:", res);
@@ -59,37 +63,164 @@ export default function LoginForm() {
     }
   };
 
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    await executeSignIn(email, password);
+  };
+
+  // Quick 1-click login helper
+  const handleQuickLogin = (quickId: string, quickPass: string) => {
+    setEmail(quickId);
+    setPassword(quickPass);
+    executeSignIn(quickId, quickPass);
+  };
+
   return (
     <div className="auth-card">
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h1>Sign in</h1>
-        <p className="auth-sub">Use your institutional college credentials to continue.</p>
+      <div style={{ marginBottom: "1.25rem" }}>
+        <h1 style={{ fontSize: "1.65rem", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 0.35rem 0", color: "var(--text-main)" }}>
+          Sign in
+        </h1>
+        <p className="auth-sub" style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)" }}>
+          Enter your college email or roll number to continue.
+        </p>
       </div>
 
       {errorMsg && (
-        <div className="auth-error" role="alert">
+        <div className="auth-error" role="alert" style={{ marginBottom: "1rem" }}>
           <AlertCircle size={18} style={{ flexShrink: 0 }} />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} noValidate={false}>
-        <div className="auth-field">
-          <label htmlFor="email">College email address</label>
+      {/* Quick 1-Click Role Fillers */}
+      <div style={{
+        marginBottom: "1.25rem",
+        padding: "0.75rem",
+        borderRadius: "12px",
+        backgroundColor: "var(--bg-input)",
+        border: "1px solid var(--border-subtle)"
+      }}>
+        <div style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--text-muted)", letterSpacing: "0.05em", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+          <Sparkles size={12} style={{ color: "var(--primary)" }} /> QUICK ACCESS DEMO LOGINS
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.45rem" }}>
+          <button
+            type="button"
+            onClick={() => handleQuickLogin("student@vtmt.org", "student123")}
+            disabled={isLoading}
+            style={{
+              padding: "0.45rem 0.6rem",
+              borderRadius: "8px",
+              border: "1px solid var(--border-subtle)",
+              backgroundColor: "var(--bg-card)",
+              color: "var(--text-main)",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              textAlign: "left",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              transition: "all 0.15s ease"
+            }}
+          >
+            <span>🎓 Student</span>
+            <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 800 }}>Fill & Go →</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleQuickLogin("admin@vtmt.org", "administrator")}
+            disabled={isLoading}
+            style={{
+              padding: "0.45rem 0.6rem",
+              borderRadius: "8px",
+              border: "1px solid var(--border-subtle)",
+              backgroundColor: "var(--bg-card)",
+              color: "var(--text-main)",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              textAlign: "left",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              transition: "all 0.15s ease"
+            }}
+          >
+            <span>⚙️ Admin</span>
+            <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 800 }}>Fill & Go →</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleQuickLogin("teacher@vtmt.org", "teacher123")}
+            disabled={isLoading}
+            style={{
+              padding: "0.45rem 0.6rem",
+              borderRadius: "8px",
+              border: "1px solid var(--border-subtle)",
+              backgroundColor: "var(--bg-card)",
+              color: "var(--text-main)",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              textAlign: "left",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              transition: "all 0.15s ease"
+            }}
+          >
+            <span>👨‍🏫 Faculty</span>
+            <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 800 }}>Fill & Go →</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleQuickLogin("hod@vtmt.org", "hod123")}
+            disabled={isLoading}
+            style={{
+              padding: "0.45rem 0.6rem",
+              borderRadius: "8px",
+              border: "1px solid var(--border-subtle)",
+              backgroundColor: "var(--bg-card)",
+              color: "var(--text-main)",
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              cursor: "pointer",
+              textAlign: "left",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              transition: "all 0.15s ease"
+            }}
+          >
+            <span>🏛️ HOD</span>
+            <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 800 }}>Fill & Go →</span>
+          </button>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="auth-field" style={{ marginBottom: "1rem" }}>
+          <label htmlFor="email" style={{ fontSize: "0.82rem", fontWeight: 700, marginBottom: "0.35rem", display: "block", color: "var(--text-main)" }}>
+            College Email or Roll Number
+          </label>
           <div className="auth-input-wrap">
             <input
               id="email"
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@veltechmultitech.org"
+              placeholder="student@vtmt.org or 23CS101"
               className="auth-input"
               style={{ paddingLeft: "38px" }}
               required
-              autoComplete="email"
               autoFocus
             />
-            <Mail
+            <User
               size={17}
               style={{
                 position: "absolute",
@@ -101,9 +232,11 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <div className="auth-field">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <label htmlFor="password">Password</label>
+        <div className="auth-field" style={{ marginBottom: "1.25rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem" }}>
+            <label htmlFor="password" style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-main)" }}>
+              Password
+            </label>
           </div>
           <div className="auth-input-wrap">
             <input
@@ -114,7 +247,6 @@ export default function LoginForm() {
               className="auth-input has-toggle"
               style={{ paddingLeft: "38px" }}
               required
-              autoComplete="current-password"
               placeholder="••••••••••••"
             />
             <Lock
@@ -139,23 +271,23 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <button type="submit" className="auth-submit" disabled={isLoading}>
+        <button type="submit" className="auth-submit" disabled={isLoading} style={{ width: "100%", padding: "0.75rem", borderRadius: "10px", fontWeight: 800 }}>
           {isLoading ? (
-            <>
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
               <Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} />
               <span>Authenticating…</span>
-            </>
+            </span>
           ) : (
-            <>
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
               <span>Sign in to VM-HUB</span>
               <ArrowRight size={16} />
-            </>
+            </span>
           )}
         </button>
       </form>
 
-      <p className="auth-help">
-        Need assistance or account access? Contact your Department Coordinator or Admin.
+      <p className="auth-help" style={{ fontSize: "0.78rem", color: "var(--text-muted)", textAlign: "center", marginTop: "1.25rem" }}>
+        Vel Tech Multi Tech Autonomous Portal • Secured Session
       </p>
     </div>
   );
