@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
-import { LogOut, Moon, Sun, UserRound } from "lucide-react";
+import { LogOut, Moon, Sun, UserRound, Sparkles } from "lucide-react";
+import BrandLogo from "@/components/BrandLogo";
 
 export interface ShellNavItem {
   href: string;
@@ -71,12 +72,8 @@ export default function AppShell({
     <div className="shell">
       <header className="shell-topbar">
         <div className="shell-topbar-inner">
-          <Link href={navItems[0]?.href ?? "/"} className="shell-brand" aria-label="VM-HUB home">
-            <span className="shell-logo" aria-hidden="true">VM</span>
-            <span className="shell-brand-text">
-              <strong>VM-HUB</strong>
-              <small>{portalLabel}</small>
-            </span>
+          <Link href={navItems[0]?.href ?? "/"} style={{ textDecoration: "none" }} aria-label="VM-HUB home">
+            <BrandLogo size="sm" subtitle={portalLabel} />
           </Link>
 
           <nav className="shell-tabs" aria-label="Primary">
@@ -90,7 +87,7 @@ export default function AppShell({
                   aria-current={active ? "page" : undefined}
                   title={label}
                 >
-                  <Icon size={20} strokeWidth={active ? 2.4 : 1.9} />
+                  <Icon size={18} strokeWidth={active ? 2.4 : 1.9} />
                   <span>{shortLabel ?? label}</span>
                 </Link>
               );
@@ -104,8 +101,8 @@ export default function AppShell({
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
               aria-label="Toggle light and dark mode"
             >
-              <Sun size={18} className="icon-for-dark" />
-              <Moon size={18} className="icon-for-light" />
+              <Sun size={17} className="icon-for-dark" style={{ color: "#fbbf24" }} />
+              <Moon size={17} className="icon-for-light" style={{ color: "#6366f1" }} />
             </button>
             <button
               type="button"
@@ -188,7 +185,7 @@ export default function AppShell({
               className={`shell-bottom-tab ${active ? "active" : ""}`}
               aria-current={active ? "page" : undefined}
             >
-              <Icon size={21} strokeWidth={active ? 2.4 : 1.9} />
+              <Icon size={20} strokeWidth={active ? 2.4 : 1.9} />
               <span>{shortLabel ?? label}</span>
             </Link>
           );

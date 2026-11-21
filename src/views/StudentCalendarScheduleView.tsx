@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { FiHome, FiCalendar, FiBell, FiUser, FiLogOut, FiClock, FiMapPin } from "react-icons/fi";
-import { signOut } from "next-auth/react";
+import { FiCalendar, FiClock, FiMapPin, FiLayers } from "react-icons/fi";
+import { Loader2 } from "lucide-react";
 
 interface TimetableEntry {
   id: string;
@@ -42,9 +41,10 @@ export default function CalendarPage() {
 
   if (loading) {
     return (
-      <div className="admin-layout">
-        <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-          <div className="loading-spinner"></div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
+          <Loader2 size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Loading weekly schedule...</p>
         </div>
       </div>
     );
@@ -55,84 +55,184 @@ export default function CalendarPage() {
   const currentEntries: TimetableEntry[] = data?.timetable?.[activeTab] || [];
 
   return (
-    <main className="student-main">
-      <header className="student-header">
-        <div>
-          <h1>Weekly Calendar</h1>
-          <p className="student-subtitle">Class: {data?.classId || "N/A"}</p>
+    <div>
+      <div style={{ marginBottom: "1.5rem" }}>
+        <h2 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 0.25rem 0" }}>Weekly Master Calendar</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>Enrolled Section:</span>
+          <span
+            style={{
+              padding: "0.15rem 0.5rem",
+              borderRadius: "4px",
+              backgroundColor: "var(--primary-subtle)",
+              color: "var(--primary)",
+              fontWeight: 700,
+              fontSize: "0.8rem",
+              border: "1px solid rgba(37, 99, 235, 0.2)",
+            }}
+          >
+            {data?.classId || "N/A"}
+          </span>
         </div>
-      </header>
+      </div>
 
       {error && (
-        <div style={{ backgroundColor: "var(--bg-card)", color: "#ef4444", padding: "1rem", borderRadius: "8px", marginBottom: "2rem", border: "1px solid #fca5a5" }}>
+        <div
+          style={{
+            backgroundColor: "var(--danger-bg)",
+            color: "var(--danger)",
+            padding: "1rem 1.25rem",
+            borderRadius: "var(--radius-sm)",
+            marginBottom: "1.5rem",
+            border: "1px solid var(--danger-border)",
+            fontSize: "0.875rem",
+          }}
+        >
           {error}
         </div>
       )}
 
       <div className="student-card" style={{ padding: 0, overflow: "hidden" }}>
-        {/* Tabs */}
-        <div style={{ display: "flex", borderBottom: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-card-header)" }}>
-          {dayOrders.map(doStr => (
-            <button
-              key={doStr}
-              onClick={() => setActiveTab(doStr)}
-              style={{
-                flex: 1,
-                padding: "1rem",
-                textAlign: "center",
-                fontWeight: 600,
-                fontSize: "0.95rem",
-                cursor: "pointer",
-                backgroundColor: activeTab === doStr ? "var(--bg-card)" : "transparent",
-                color: activeTab === doStr ? "var(--royal-blue)" : "var(--text-muted)",
-                borderBottom: activeTab === doStr ? "2px solid var(--royal-blue)" : "2px solid transparent",
-                transition: "all 0.2s"
-              }}
-            >
-              {doStr === "UNASSIGNED" ? "Unassigned" : `Day Order ${doStr}`}
-            </button>
-          ))}
+        {/* Modern Segmented Day Order Tabs */}
+        <div
+          style={{
+            display: "flex",
+            borderBottom: "1px solid var(--border-card)",
+            backgroundColor: "var(--bg-card-header)",
+            overflowX: "auto",
+          }}
+        >
+          {dayOrders.map((doStr) => {
+            const isSelected = activeTab === doStr;
+            return (
+              <button
+                key={doStr}
+                onClick={() => setActiveTab(doStr)}
+                style={{
+                  flex: 1,
+                  padding: "0.95rem 1rem",
+                  textAlign: "center",
+                  fontWeight: isSelected ? 700 : 500,
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  backgroundColor: isSelected ? "var(--bg-card)" : "transparent",
+                  color: isSelected ? "var(--primary)" : "var(--text-muted)",
+                  border: "none",
+                  borderBottom: isSelected ? "2px solid var(--primary)" : "2px solid transparent",
+                  transition: "all 0.18s ease",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {doStr === "UNASSIGNED" ? "Unassigned" : `Day Order ${doStr}`}
+              </button>
+            );
+          })}
         </div>
 
         {/* Schedule List */}
         <div style={{ padding: "1.5rem" }}>
           {currentEntries.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "3rem 1rem", color: "var(--text-muted)" }}>
-              <FiCalendar style={{ fontSize: "3rem", marginBottom: "1rem", opacity: 0.2 }} />
-              <h3>No classes scheduled</h3>
-              <p>{activeTab === "UNASSIGNED" ? "These entries are missing a day order." : "Enjoy your free day!"}</p>
+            <div style={{ textAlign: "center", padding: "3.5rem 1rem", color: "var(--text-muted)" }}>
+              <FiCalendar style={{ fontSize: "2.75rem", marginBottom: "0.75rem", opacity: 0.3 }} />
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, margin: "0 0 0.35rem 0", color: "var(--text-main)" }}>
+                No classes scheduled
+              </h3>
+              <p style={{ fontSize: "0.85rem", margin: 0 }}>
+                {activeTab === "UNASSIGNED" ? "These entries are missing a day order." : "Enjoy your free day!"}
+              </p>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
               {currentEntries.map((entry) => (
-                <div key={entry.id} style={{ 
-                  display: "flex", 
-                  backgroundColor: "var(--bg-card)", 
-                  border: "1px solid var(--border-subtle)", 
-                  borderRadius: "12px", 
-                  padding: "1rem 1.5rem",
-                  alignItems: "center",
-                  boxShadow: "var(--shadow-card)",
-                  transition: "border 0.3s ease"
-                }}>
-                  <div style={{ marginRight: "1.5rem", minWidth: "120px" }}>
-                    <div style={{ fontWeight: 700, color: "var(--text-main)", fontSize: "1.1rem" }}>{entry.period ? `Period ${entry.period}` : "Period not set"}</div>
-                    <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "0.25rem", marginTop: "0.25rem" }}>
-                      <FiClock /> {entry.timeRange || "Time not set"}
+                <div
+                  key={entry.id}
+                  style={{
+                    display: "flex",
+                    backgroundColor: "var(--bg-card)",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "1rem 1.25rem",
+                    alignItems: "center",
+                    boxShadow: "var(--shadow-sm)",
+                    transition: "all 0.18s var(--ease-smooth)",
+                    gap: "1.25rem",
+                    flexWrap: "wrap",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--primary)";
+                    e.currentTarget.style.boxShadow = "var(--shadow-card)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-subtle)";
+                    e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+                  }}
+                >
+                  <div style={{ minWidth: "120px" }}>
+                    <div
+                      style={{
+                        fontWeight: 700,
+                        color: "var(--text-main)",
+                        fontSize: "1rem",
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                    >
+                      {entry.period ? `Period ${entry.period}` : "Period not set"}
+                    </div>
+                    <div
+                      style={{
+                        color: "var(--text-muted)",
+                        fontSize: "0.8rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
+                        marginTop: "0.2rem",
+                        fontVariantNumeric: "tabular-nums",
+                      }}
+                    >
+                      <FiClock size={13} /> {entry.timeRange || "Time not set"}
                     </div>
                   </div>
-                  
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, color: "var(--royal-blue)", fontSize: "1.05rem" }}>
-                      {entry.subjectName || "Subject not set"}{entry.subjectCode ? ` (${entry.subjectCode})` : ""}
+
+                  <div style={{ flex: 1, minWidth: "200px" }}>
+                    <div style={{ fontWeight: 700, color: "var(--primary)", fontSize: "1.05rem" }}>
+                      {entry.subjectName || "Subject not set"}
+                      {entry.subjectCode && (
+                        <span
+                          style={{
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            padding: "0.1rem 0.4rem",
+                            borderRadius: "4px",
+                            backgroundColor: "var(--bg-input)",
+                            color: "var(--text-muted)",
+                            marginLeft: "0.5rem",
+                            border: "1px solid var(--border-subtle)",
+                          }}
+                        >
+                          {entry.subjectCode}
+                        </span>
+                      )}
                     </div>
-                    <div style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginTop: "0.25rem" }}>
+                    <div style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: "0.25rem" }}>
                       {entry.facultyName || "Faculty not set"}
                     </div>
                   </div>
-                  
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--text-main)", fontWeight: 500, backgroundColor: "var(--bg-card-header)", padding: "0.5rem 1rem", borderRadius: "99px" }}>
-                    <FiMapPin /> {entry.roomNo || "Room not set"}
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.4rem",
+                      color: "var(--text-main)",
+                      fontWeight: 600,
+                      backgroundColor: "var(--bg-input)",
+                      padding: "0.4rem 0.85rem",
+                      borderRadius: "999px",
+                      fontSize: "0.825rem",
+                      border: "1px solid var(--border-subtle)",
+                    }}
+                  >
+                    <FiMapPin size={13} style={{ color: "var(--primary)" }} /> {entry.roomNo || "Room not set"}
                   </div>
                 </div>
               ))}
@@ -140,6 +240,6 @@ export default function CalendarPage() {
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

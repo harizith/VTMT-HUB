@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Briefcase, Users, Activity, FileSpreadsheet, Download } from "lucide-react";
+import { Briefcase, Users, Activity, FileSpreadsheet, Loader2 } from "lucide-react";
 import * as XLSX from "xlsx";
 
 export default function DepartmentPage() {
@@ -12,8 +12,8 @@ export default function DepartmentPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/admin/departments").then(r => r.json()).catch(() => null),
-      fetch("/api/hod/dashboard").then(r => r.json()).catch(() => null)
+      fetch("/api/admin/departments").then((r) => r.json()).catch(() => null),
+      fetch("/api/hod/dashboard").then((r) => r.json()).catch(() => null),
     ])
       .then(([deptRes, hodRes]) => {
         let hodDeptCode = hodRes?.data?.hod?.department || "CSE";
@@ -22,7 +22,6 @@ export default function DepartmentPage() {
           foundDept = deptRes.departments.find((d: any) => d.code === hodDeptCode) || deptRes.departments[0];
         }
         if (foundDept) {
-          // If department hodName is missing or unassigned in DB, fallback to logged-in HOD's name
           if (!foundDept.hodName && hodRes?.data?.hod?.name) {
             foundDept = { ...foundDept, hodName: hodRes.data.hod.name };
           }
@@ -33,7 +32,7 @@ export default function DepartmentPage() {
         }
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
         setLoading(false);
       });
@@ -45,11 +44,11 @@ export default function DepartmentPage() {
     try {
       const res = await fetch(`/api/hod/attendance/export?departmentCode=${dept.code}`);
       const { data } = await res.json();
-      
+
       const worksheetData = data.students.map((s: any) => ({
         "Roll No": s.studentProfile?.rollNumber || s.vmNo || "N/A",
-        "Name": s.name,
-        "Section": s.studentProfile?.section || "N/A",
+        Name: s.name,
+        Section: s.studentProfile?.section || "N/A",
         "Total Present": data.attendance.filter((a: any) => a.studentId === s.id && a.status === "PRESENT").length,
         "Total Absent": data.attendance.filter((a: any) => a.studentId === s.id && a.status === "ABSENT").length,
       }));
@@ -67,70 +66,188 @@ export default function DepartmentPage() {
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <header style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div>
+      <div
+        style={{
+          marginBottom: "1.75rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
         <div>
-          <h1 style={{ fontSize: "2rem", margin: "0 0 0.5rem 0", background: "linear-gradient(90deg, #10b981, #34d399)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            Department Overview
-          </h1>
-          <p style={{ color: "var(--text-muted)", margin: 0 }}>View department statistics and details.</p>
+          <h2 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 0.25rem 0" }}>
+            Department Operational Overview
+          </h2>
+          <p style={{ color: "var(--text-muted)", margin: 0, fontSize: "0.85rem" }}>
+            Departmental intelligence, strength analytics, and university compliance summaries.
+          </p>
         </div>
-        <button 
-          onClick={handleExportAll}
-          disabled={exporting}
-          style={{ backgroundColor: "var(--royal-blue)", color: "white", padding: "0.8rem 1.2rem", borderRadius: "10px", border: "none", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem" }}
-        >
-          {exporting ? "Generating..." : <><FileSpreadsheet size={18} /> Export All Student Attendance</>}
+        <button onClick={handleExportAll} disabled={exporting} className="btn-royal">
+          {exporting ? (
+            <>
+              <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+              <span>Generating Excel...</span>
+            </>
+          ) : (
+            <>
+              <FileSpreadsheet size={16} />
+              <span>Export All Student Attendance</span>
+            </>
+          )}
         </button>
-      </header>
+      </div>
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: "3rem" }}>Loading department data...</div>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
+            <Loader2 size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
+            <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Loading department metrics...</p>
+          </div>
+        </div>
       ) : dept ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          <div className="student-card premium-card" style={{ padding: "2rem", borderRadius: "16px", border: "1px solid var(--border-subtle)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-              <div style={{ width: "80px", height: "80px", borderRadius: "16px", backgroundColor: "rgba(16,185,129,0.1)", color: "#10b981", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Briefcase size={40} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div className="student-card premium-card" style={{ padding: "1.75rem" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+              <div
+                style={{
+                  width: "64px",
+                  height: "64px",
+                  borderRadius: "14px",
+                  backgroundColor: "rgba(16, 185, 129, 0.12)",
+                  color: "#10b981",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <Briefcase size={32} />
               </div>
               <div>
-                <h2 style={{ fontSize: "1.8rem", margin: "0 0 0.2rem 0" }}>{dept.name}</h2>
-                <span style={{ fontSize: "1rem", color: "#10b981", fontWeight: "bold", padding: "0.2rem 0.6rem", backgroundColor: "rgba(16,185,129,0.1)", borderRadius: "6px" }}>{dept.code}</span>
+                <h3 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 0.25rem 0", color: "var(--text-main)" }}>
+                  {dept.name}
+                </h3>
+                <span
+                  style={{
+                    fontSize: "0.8rem",
+                    color: "#10b981",
+                    fontWeight: 700,
+                    padding: "0.15rem 0.55rem",
+                    backgroundColor: "rgba(16, 185, 129, 0.12)",
+                    borderRadius: "6px",
+                    border: "1px solid rgba(16, 185, 129, 0.25)",
+                  }}
+                >
+                  DEPT CODE: {dept.code}
+                </span>
               </div>
             </div>
-            <div style={{ marginTop: "2rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              <div style={{ padding: "1rem", backgroundColor: "var(--bg-input)", borderRadius: "12px" }}>
-                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.5rem" }}>Head of Department</div>
-                <div style={{ fontSize: "1.1rem", fontWeight: "600" }}>{dept.hodName || "Not Assigned"}</div>
+
+            <div
+              style={{
+                marginTop: "1.5rem",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: "1rem",
+              }}
+            >
+              <div
+                style={{
+                  padding: "0.85rem 1rem",
+                  backgroundColor: "var(--bg-input)",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid var(--border-subtle)",
+                }}
+              >
+                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginBottom: "0.3rem", fontWeight: 700 }}>
+                  HEAD OF DEPARTMENT
+                </div>
+                <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-main)" }}>
+                  {dept.hodName || "Not Assigned"}
+                </div>
               </div>
-              <div style={{ padding: "1rem", backgroundColor: "var(--bg-input)", borderRadius: "12px" }}>
-                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.5rem" }}>Status</div>
-                <div style={{ fontSize: "1.1rem", fontWeight: "600", color: "#10b981" }}>Active & Accredited</div>
+              <div
+                style={{
+                  padding: "0.85rem 1rem",
+                  backgroundColor: "var(--bg-input)",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid var(--border-subtle)",
+                }}
+              >
+                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginBottom: "0.3rem", fontWeight: 700 }}>
+                  INSTITUTIONAL STATUS
+                </div>
+                <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#10b981" }}>
+                  ● Active & NAAC / NBA Accredited
+                </div>
               </div>
             </div>
           </div>
-          
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "1.5rem" }}>
-             <div className="student-card premium-card" style={{ padding: "1.5rem", borderRadius: "12px", display: "flex", alignItems: "center", gap: "1rem" }}>
-               <Users size={30} color="var(--sky-blue)" />
-               <div>
-                 <h4 style={{ margin: 0, fontSize: "1.2rem" }}>{stats.totalStudents}</h4>
-                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Active Students</span>
-               </div>
-             </div>
-             <div className="student-card premium-card" style={{ padding: "1.5rem", borderRadius: "12px", display: "flex", alignItems: "center", gap: "1rem" }}>
-               <Activity size={30} color="#a855f7" />
-               <div>
-                 <h4 style={{ margin: 0, fontSize: "1.2rem" }}>{stats.avgAttendance}%</h4>
-                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Daily Attendance (Period 1)</span>
-               </div>
-             </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.25rem" }}>
+            <div
+              className="student-card premium-card"
+              style={{ padding: "1.25rem 1.5rem", display: "flex", alignItems: "center", gap: "1rem" }}
+            >
+              <div
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "10px",
+                  backgroundColor: "var(--primary-subtle)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--primary)",
+                }}
+              >
+                <Users size={24} />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: "var(--text-main)", fontVariantNumeric: "tabular-nums" }}>
+                  {stats.totalStudents}
+                </h4>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600 }}>
+                  Active Enrolled Students
+                </span>
+              </div>
+            </div>
+
+            <div
+              className="student-card premium-card"
+              style={{ padding: "1.25rem 1.5rem", display: "flex", alignItems: "center", gap: "1rem" }}
+            >
+              <div
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "10px",
+                  backgroundColor: "rgba(168, 85, 247, 0.12)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#a855f7",
+                }}
+              >
+                <Activity size={24} />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, color: "var(--text-main)", fontVariantNumeric: "tabular-nums" }}>
+                  {stats.avgAttendance}%
+                </h4>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600 }}>
+                  Daily Attendance (Period 1)
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
-        <div>No department data found.</div>
+        <div style={{ color: "var(--text-muted)" }}>No department data found.</div>
       )}
     </div>
   );
 }
-

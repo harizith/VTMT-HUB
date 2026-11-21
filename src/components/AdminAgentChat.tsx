@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare, X, Send, Database, Loader2, Paperclip } from "lucide-react";
+import { MessageSquare, X, Send, Database, Loader2, Paperclip, Sparkles, Terminal, CheckCircle2 } from "lucide-react";
 import * as XLSX from "xlsx";
 
 export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpdated?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "agent"; content: string; data?: any }[]>([
-    { role: "agent", content: "Hello! I am your fully autonomous AI agent. Ask me to add, edit, update, delete, or search data (e.g., 'Update John to be an ADMIN', 'Delete all notices from yesterday')." }
+    { role: "agent", content: "Autonomous Academic Copilot online. Query or mutate institution records, faculty allocations, timetable conflicts, or upload an Excel dataset to analyze." }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,7 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
           const ws = wb.Sheets[wsname];
           const data = XLSX.utils.sheet_to_json(ws);
           setAttachedData(data);
-          setMessages(prev => [...prev, { role: "agent", content: `(Attached ${file.name} with ${data.length} rows. You can now ask me to import or process this data!)` }]);
+          setMessages(prev => [...prev, { role: "agent", content: `(Attached ${file.name} with ${data.length} records. Ask me to parse, import, or audit this spreadsheet!)` }]);
         }
         setIsLoading(false);
       };
@@ -65,7 +65,7 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
       const payload: any = { 
         query: userMessage,
         history: messages
-          .filter(m => !m.content.startsWith("(Attached") && !m.content.startsWith("Hello! I am your"))
+          .filter(m => !m.content.startsWith("(Attached") && !m.content.startsWith("Autonomous Academic Copilot"))
           .slice(-2)
           .map(m => ({
             role: m.role === "agent" ? "assistant" : "user",
@@ -113,21 +113,29 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
           position: "fixed",
           bottom: "2rem",
           right: "2rem",
-          backgroundColor: "var(--royal-blue)",
-          color: "white",
+          backgroundColor: "var(--primary)",
+          color: "#ffffff",
           borderRadius: "50%",
-          width: "60px",
-          height: "60px",
+          width: "56px",
+          height: "56px",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+          boxShadow: "0 10px 25px -4px rgba(37, 99, 235, 0.45)",
           cursor: "pointer",
-          border: "none",
-          zIndex: 9999
+          border: "2px solid rgba(255,255,255,0.2)",
+          zIndex: 9999,
+          transition: "transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease"
         }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = "scale(1.08)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+        aria-label="Open Academic Copilot"
       >
-        <Database size={28} />
+        <Sparkles size={24} />
       </button>
     );
   }
@@ -137,11 +145,13 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
       position: "fixed",
       bottom: "2rem",
       right: "2rem",
-      width: "380px",
-      height: "550px",
+      width: "400px",
+      maxWidth: "calc(100vw - 2rem)",
+      height: "580px",
+      maxHeight: "calc(100vh - 4rem)",
       backgroundColor: "var(--bg-card)",
-      borderRadius: "16px",
-      boxShadow: "0 10px 40px rgba(0,0,0,0.3)",
+      borderRadius: "20px",
+      boxShadow: "0 20px 48px -12px rgba(0, 0, 0, 0.3)",
       display: "flex",
       flexDirection: "column",
       border: "1px solid var(--border-subtle)",
@@ -150,50 +160,92 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
     }}>
       {/* Header */}
       <div style={{
-        padding: "0.85rem 1rem",
-        backgroundColor: "var(--royal-blue)",
-        color: "white",
+        padding: "1rem 1.25rem",
+        backgroundColor: "var(--bg-card-header)",
+        borderBottom: "1px solid var(--border-subtle)",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center"
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontWeight: "600" }}>
-          <Database size={18} />
-          <span>Academic Copilot</span>
-          <span style={{ fontSize: "0.7rem", padding: "0.15rem 0.4rem", borderRadius: "4px", backgroundColor: "rgba(255,255,255,0.2)", fontWeight: "500" }}>Fast & Efficient</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <div style={{
+            width: "32px",
+            height: "32px",
+            borderRadius: "10px",
+            backgroundColor: "rgba(37, 99, 235, 0.12)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--primary)"
+          }}>
+            <Sparkles size={18} />
+          </div>
+          <div>
+            <div style={{ fontSize: "0.95rem", fontWeight: "800", color: "var(--text-main)", letterSpacing: "-0.01em" }}>
+              Academic Copilot
+            </div>
+            <div style={{ fontSize: "0.72rem", color: "#10b981", fontWeight: "700", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#10b981", display: "inline-block" }} />
+              Autonomous Engine Active
+            </div>
+          </div>
         </div>
         <button 
           onClick={() => setIsOpen(false)}
-          style={{ background: "transparent", border: "none", color: "white", cursor: "pointer" }}
+          style={{
+            background: "var(--bg-input)",
+            border: "1px solid var(--border-subtle)",
+            borderRadius: "8px",
+            color: "var(--text-muted)",
+            cursor: "pointer",
+            padding: "0.35rem 0.45rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
         >
-          <X size={20} />
+          <X size={16} />
         </button>
       </div>
 
       {/* Quick Suggestion Chips */}
-      <div style={{ padding: "0.5rem 0.75rem", backgroundColor: "var(--bg-input)", borderBottom: "1px solid var(--border-subtle)", display: "flex", gap: "0.4rem", overflowX: "auto" }}>
+      <div style={{
+        padding: "0.6rem 0.85rem",
+        backgroundColor: "var(--bg-input)",
+        borderBottom: "1px solid var(--border-subtle)",
+        display: "flex",
+        gap: "0.4rem",
+        overflowX: "auto"
+      }}>
         {[
           "List all departments",
           "Show recent notices",
           "Count students",
-          "Reset user password"
+          "Audit timetable"
         ].map((prompt, idx) => (
           <button
             key={idx}
             onClick={() => setInput(prompt)}
             style={{
-              padding: "0.25rem 0.6rem",
-              borderRadius: "12px",
+              padding: "0.25rem 0.65rem",
+              borderRadius: "99px",
               border: "1px solid var(--border-subtle)",
               backgroundColor: "var(--bg-card)",
               color: "var(--text-muted)",
               fontSize: "0.72rem",
+              fontWeight: 600,
               whiteSpace: "nowrap",
               cursor: "pointer",
               transition: "all 0.15s ease"
             }}
-            onMouseEnter={e => (e.currentTarget.style.color = "var(--sky-blue)")}
-            onMouseLeave={e => (e.currentTarget.style.color = "var(--text-muted)")}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = "var(--primary)";
+              e.currentTarget.style.color = "var(--primary)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = "var(--border-subtle)";
+              e.currentTarget.style.color = "var(--text-muted)";
+            }}
           >
             {prompt}
           </button>
@@ -201,21 +253,22 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "1rem", display: "flex", flexDirection: "column", gap: "1rem", backgroundColor: "var(--bg-main)" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "1.25rem", display: "flex", flexDirection: "column", gap: "1rem", backgroundColor: "var(--bg-main)" }}>
         {messages.map((m, i) => (
           <div key={i} style={{ 
             alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-            maxWidth: "85%"
+            maxWidth: "88%"
           }}>
             <div style={{
               padding: "0.75rem 1rem",
-              borderRadius: "12px",
-              backgroundColor: m.role === "user" ? "var(--sky-blue)" : "var(--bg-input)",
-              color: m.role === "user" ? "white" : "var(--text-main)",
+              borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
+              backgroundColor: m.role === "user" ? "var(--primary)" : "var(--bg-card)",
+              color: m.role === "user" ? "#ffffff" : "var(--text-main)",
               border: m.role === "agent" ? "1px solid var(--border-subtle)" : "none",
-              fontSize: "0.9rem",
-              lineHeight: "1.4",
-              whiteSpace: "pre-wrap"
+              fontSize: "0.88rem",
+              lineHeight: "1.45",
+              whiteSpace: "pre-wrap",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.03)"
             }}>
               {m.content}
             </div>
@@ -224,22 +277,31 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
                 marginTop: "0.5rem", 
                 display: "flex", 
                 flexDirection: "column", 
-                gap: "0.5rem",
-                maxHeight: "300px",
-                overflowY: "auto",
-                paddingRight: "0.25rem"
+                gap: "0.4rem",
+                maxHeight: "240px",
+                overflowY: "auto"
               }}>
-                <div style={{ padding: "0.5rem", backgroundColor: "var(--bg-input)", borderRadius: "8px", border: "1px solid var(--border-subtle)" }}>
-                   <div style={{ fontSize: "0.75rem", fontFamily: "monospace", color: "var(--text-muted)", marginBottom: "4px" }}>SQL Executed:</div>
-                   <div style={{ fontSize: "0.8rem", color: "var(--royal-blue)", fontFamily: "monospace" }}>{m.data.sqlQuery}</div>
+                <div style={{
+                  padding: "0.6rem 0.85rem",
+                  backgroundColor: "var(--bg-card)",
+                  borderRadius: "10px",
+                  border: "1px solid var(--border-subtle)"
+                }}>
+                  <div style={{ fontSize: "0.7rem", fontFamily: "var(--font-mono, monospace)", color: "var(--text-muted)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                    <Terminal size={12} /> Executed SQL Query:
+                  </div>
+                  <div style={{ fontSize: "0.78rem", color: "var(--primary)", fontFamily: "var(--font-mono, monospace)", wordBreak: "break-all" }}>
+                    {m.data.sqlQuery}
+                  </div>
                 </div>
               </div>
             )}
           </div>
         ))}
         {isLoading && (
-          <div style={{ alignSelf: "flex-start", padding: "0.75rem", color: "var(--text-muted)" }}>
-            <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+          <div style={{ alignSelf: "flex-start", padding: "0.5rem 1rem", backgroundColor: "var(--bg-card)", borderRadius: "12px", border: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--text-muted)", fontSize: "0.82rem" }}>
+            <Loader2 size={14} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
+            <span>Consulting institutional schema...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -247,8 +309,8 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
 
       {/* Attached File Pill */}
       {attachedFileName && (
-        <div style={{ padding: "0.5rem 1rem", backgroundColor: "var(--bg-main)", borderTop: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ fontSize: "0.8rem", color: "var(--royal-blue)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div style={{ padding: "0.5rem 1rem", backgroundColor: "var(--bg-input)", borderTop: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ fontSize: "0.78rem", color: "var(--primary)", display: "flex", alignItems: "center", gap: "0.4rem", fontWeight: 700 }}>
             <Paperclip size={14} /> Attached: {attachedFileName}
           </div>
           <button onClick={() => { setAttachedData(null); setAttachedFileName(null); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}>
@@ -258,19 +320,20 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
       )}
 
       {/* Input */}
-      <div style={{ padding: "1rem", borderTop: "1px solid var(--border-subtle)", display: "flex", gap: "0.5rem", backgroundColor: "var(--bg-card)" }}>
+      <div style={{ padding: "0.85rem 1rem", borderTop: "1px solid var(--border-subtle)", display: "flex", gap: "0.5rem", backgroundColor: "var(--bg-card)" }}>
         <label style={{
-            padding: "0.75rem",
-            borderRadius: "8px",
+            padding: "0.65rem",
+            borderRadius: "10px",
             backgroundColor: "var(--bg-input)",
-            color: "var(--text-main)",
+            color: "var(--text-muted)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             border: "1px solid var(--border-subtle)",
+            transition: "all 0.15s ease"
           }}>
-          <Paperclip size={18} />
+          <Paperclip size={16} />
           <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} style={{ display: "none" }} />
         </label>
         <input 
@@ -278,34 +341,36 @@ export default function AdminAgentChat({ onTimetableUpdated }: { onTimetableUpda
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && handleSend()}
-          placeholder="Ask me to add, update, delete, or fetch data..."
+          placeholder="Ask me to mutate, count, or inspect records..."
           style={{
             flex: 1,
-            padding: "0.75rem",
-            borderRadius: "8px",
+            padding: "0.65rem 0.85rem",
+            borderRadius: "10px",
             border: "1px solid var(--border-subtle)",
             backgroundColor: "var(--bg-input)",
             color: "var(--text-main)",
-            outline: "none"
+            outline: "none",
+            fontSize: "0.85rem"
           }}
         />
         <button 
           onClick={handleSend}
           disabled={!input.trim() || isLoading}
           style={{
-            padding: "0.75rem",
-            borderRadius: "8px",
-            backgroundColor: "var(--royal-blue)",
+            padding: "0.65rem 0.95rem",
+            borderRadius: "10px",
+            backgroundColor: "var(--primary)",
             color: "white",
             border: "none",
-            cursor: "pointer",
+            cursor: (!input.trim() || isLoading) ? "not-allowed" : "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            opacity: (!input.trim() || isLoading) ? 0.6 : 1
+            opacity: (!input.trim() || isLoading) ? 0.6 : 1,
+            transition: "all 0.15s ease"
           }}
         >
-          <Send size={18} />
+          <Send size={16} />
         </button>
       </div>
     </div>

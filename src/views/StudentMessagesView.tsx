@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { FiHome, FiCalendar, FiBell, FiUser, FiLogOut, FiMessageSquare, FiAlertCircle, FiInfo } from "react-icons/fi";
-import { signOut } from "next-auth/react";
+import { FiMessageSquare, FiAlertCircle, FiInfo, FiCalendar } from "react-icons/fi";
+import { Loader2, Bell } from "lucide-react";
 
 interface Notice {
   id: string;
@@ -41,98 +40,220 @@ export default function MessagesPage() {
 
   if (loading) {
     return (
-      <div className="admin-layout">
-        <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-          <div className="loading-spinner"></div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
+          <Loader2 size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Loading notices and circulars...</p>
         </div>
       </div>
     );
   }
 
-  const getCategoryIcon = (cat: string) => {
+  const getCategoryTheme = (cat: string) => {
     switch (cat.toUpperCase()) {
-      case "URGENT": return <FiAlertCircle style={{ color: "#ef4444" }} />;
-      case "EXAM": return <FiCalendar style={{ color: "#f59e0b" }} />;
-      default: return <FiInfo style={{ color: "#3b82f6" }} />;
-    }
-  };
-
-  const getCategoryColor = (cat: string) => {
-    switch (cat.toUpperCase()) {
-      case "URGENT": return { bg: "#fef2f2", text: "#ef4444", border: "#fca5a5" };
-      case "EXAM": return { bg: "#fffbeb", text: "#d97706", border: "#fcd34d" };
-      default: return { bg: "#eff6ff", text: "#3b82f6", border: "#bfdbfe" };
+      case "URGENT":
+        return {
+          icon: <FiAlertCircle size={17} style={{ color: "var(--danger)" }} />,
+          bg: "var(--danger-bg)",
+          text: "var(--danger)",
+          border: "var(--danger-border)",
+          accent: "var(--danger)",
+        };
+      case "EXAM":
+        return {
+          icon: <FiCalendar size={17} style={{ color: "var(--warning)" }} />,
+          bg: "var(--warning-bg)",
+          text: "var(--warning)",
+          border: "var(--warning-border)",
+          accent: "var(--warning)",
+        };
+      default:
+        return {
+          icon: <FiInfo size={17} style={{ color: "var(--primary)" }} />,
+          bg: "var(--primary-subtle)",
+          text: "var(--primary)",
+          border: "rgba(37, 99, 235, 0.2)",
+          accent: "var(--primary)",
+        };
     }
   };
 
   return (
-    <main className="student-main">
-      <header className="student-header" style={{ marginBottom: "2rem" }}>
-        <div>
-          <h1>Messages & Notices</h1>
-          <p className="student-subtitle">Official communications from your department and college.</p>
-        </div>
-      </header>
+    <div>
+      <div style={{ marginBottom: "1.75rem" }}>
+        <h2 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 0.25rem 0" }}>
+          Campus Notices & Announcements
+        </h2>
+        <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)" }}>
+          Official circulars, academic notifications, and direct department broadcasts.
+        </p>
+      </div>
 
       {error && (
-        <div style={{ backgroundColor: "var(--bg-card)", color: "#ef4444", padding: "1rem", borderRadius: "8px", marginBottom: "2rem", border: "1px solid #fca5a5" }}>
+        <div
+          style={{
+            backgroundColor: "var(--danger-bg)",
+            color: "var(--danger)",
+            padding: "1rem 1.25rem",
+            borderRadius: "var(--radius-sm)",
+            marginBottom: "1.5rem",
+            border: "1px solid var(--danger-border)",
+            fontSize: "0.875rem",
+          }}
+        >
           {error}
         </div>
       )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         {notices.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "4rem 2rem", backgroundColor: "var(--bg-card)", borderRadius: "16px", border: "1px dashed var(--border-subtle)" }}>
-            <FiMessageSquare style={{ fontSize: "3rem", color: "var(--text-muted)", marginBottom: "1rem" }} />
-            <h3 style={{ color: "var(--text-main)" }}>No announcements yet</h3>
-            <p style={{ color: "var(--text-muted)" }}>All official circulars and notices will appear here.</p>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "4rem 2rem",
+              backgroundColor: "var(--bg-card)",
+              borderRadius: "var(--radius-card)",
+              border: "1px dashed var(--border-subtle)",
+            }}
+          >
+            <FiMessageSquare style={{ fontSize: "2.75rem", color: "var(--text-tertiary)", marginBottom: "0.75rem" }} />
+            <h3 style={{ color: "var(--text-main)", fontSize: "1.1rem", fontWeight: 700, margin: "0 0 0.25rem 0" }}>
+              No announcements yet
+            </h3>
+            <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", margin: 0 }}>
+              All official circulars and notices will appear here.
+            </p>
           </div>
         ) : (
           notices.map((notice) => {
-            const colors = getCategoryColor(notice.category);
+            const catTheme = getCategoryTheme(notice.category);
             return (
-              <div key={notice.id} className="student-card premium-card" style={{ display: "flex", flexDirection: "column", gap: "0.75rem", borderLeft: `4px solid ${colors.text}` }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.5rem" }}>
+              <div
+                key={notice.id}
+                className="student-card premium-card"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.85rem",
+                  borderLeft: `4px solid ${catTheme.accent}`,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    flexWrap: "wrap",
+                    gap: "0.75rem",
+                  }}
+                >
                   <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                    {getCategoryIcon(notice.category)}
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "8px",
+                        backgroundColor: catTheme.bg,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {catTheme.icon}
+                    </div>
                     <div>
-                      <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sky-blue)", textTransform: "uppercase", letterSpacing: "0.05em", display: "block" }}>Announcement Heading</span>
-                      <h2 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 800, color: "var(--text-main)" }}>{notice.title}</h2>
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontSize: "1.15rem",
+                          fontWeight: 700,
+                          color: "var(--text-main)",
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        {notice.title}
+                      </h3>
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+
+                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
                     {notice.audience === "SPECIFIC_STUDENT" && (
-                      <span style={{ fontSize: "0.7rem", fontWeight: 700, padding: "0.2rem 0.5rem", borderRadius: "4px", backgroundColor: "rgba(168, 85, 247, 0.15)", color: "#a855f7", border: "1px solid rgba(168, 85, 247, 0.3)" }}>
+                      <span
+                        style={{
+                          fontSize: "0.7rem",
+                          fontWeight: 700,
+                          padding: "0.2rem 0.55rem",
+                          borderRadius: "999px",
+                          backgroundColor: "rgba(168, 85, 247, 0.15)",
+                          color: "#a855f7",
+                          border: "1px solid rgba(168, 85, 247, 0.3)",
+                        }}
+                      >
                         DIRECT MESSAGE
                       </span>
                     )}
-                    <span style={{ 
-                      fontSize: "0.75rem", 
-                      fontWeight: 700, 
-                      padding: "0.25rem 0.6rem", 
-                      borderRadius: "6px",
-                      backgroundColor: colors.bg,
-                      color: colors.text,
-                      border: `1px solid ${colors.border}`
-                    }}>
+                    <span
+                      style={{
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        padding: "0.2rem 0.6rem",
+                        borderRadius: "999px",
+                        backgroundColor: catTheme.bg,
+                        color: catTheme.text,
+                        border: `1px solid ${catTheme.border}`,
+                        letterSpacing: "0.02em",
+                      }}
+                    >
                       {(notice.category || "GENERAL").toUpperCase()}
                     </span>
                   </div>
                 </div>
-                
-                <p style={{ margin: "0.5rem 0", color: "var(--text-main)", lineHeight: "1.6", whiteSpace: "pre-line", fontSize: "0.95rem" }}>
+
+                <p
+                  style={{
+                    margin: "0.25rem 0",
+                    color: "var(--text-main)",
+                    lineHeight: 1.6,
+                    whiteSpace: "pre-line",
+                    fontSize: "0.925rem",
+                  }}
+                >
                   {notice.content}
                 </p>
-                
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "0.5rem", fontSize: "0.85rem", color: "var(--text-muted)", borderTop: "1px solid var(--border-subtle)", paddingTop: "0.75rem" }}>
-                  <span>Posted by: <strong style={{ color: "var(--text-main)" }}>{notice.postedBy}</strong></span>
-                  <span>{new Date(notice.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: "0.25rem",
+                    fontSize: "0.8rem",
+                    color: "var(--text-muted)",
+                    borderTop: "1px solid var(--border-subtle)",
+                    paddingTop: "0.75rem",
+                    flexWrap: "wrap",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <span>
+                    Issued by: <strong style={{ color: "var(--text-main)" }}>{notice.postedBy}</strong>
+                  </span>
+                  <span style={{ fontVariantNumeric: "tabular-nums" }}>
+                    {new Date(notice.createdAt).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
                 </div>
               </div>
             );
           })
         )}
       </div>
-    </main>
+    </div>
   );
 }

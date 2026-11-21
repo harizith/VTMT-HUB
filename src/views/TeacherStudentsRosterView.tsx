@@ -178,7 +178,7 @@ export default function TeacherStudentsPage() {
   };
 
   return (
-    <main className="student-main">
+    <div>
       <header className="student-header">
         <div>
           <h1>Attendance & Students</h1>
@@ -638,6 +638,6 @@ export default function TeacherStudentsPage() {
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }

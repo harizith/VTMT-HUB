@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { Users, Building2, BookOpen, Megaphone, Calendar, Sun, Moon, Globe, GraduationCap, Briefcase, UserCircle, Shield, Save, Edit, ArrowRight, Trash2, FileSpreadsheet, UserPlus, FileText, X, Zap, LayoutGrid, Shuffle, UserCheck, Loader2, History, Search, CheckCircle2 } from "lucide-react";
+import { Users, Building2, BookOpen, Megaphone, Calendar, Sun, Moon, Globe, GraduationCap, Briefcase, UserCircle, Shield, Save, Edit, ArrowRight, Trash2, FileSpreadsheet, UserPlus, FileText, X, Zap, LayoutGrid, Shuffle, UserCheck, Loader2, History, Search, CheckCircle2, LogOut } from "lucide-react";
 import AdminAgentChat from "@/components/AdminAgentChat";
 import AdminTimetablePdfUpload from "@/components/AdminTimetablePdfUpload";
 import AdminTimetableExcelUpload from "@/components/AdminTimetableExcelUpload";
@@ -15,6 +15,7 @@ import Clock from "@/components/Clock";
 import AdminAutomationHub from "@/components/AdminAutomationHub";
 import TimetableCalendarView from "@/components/TimetableCalendarView";
 import AdminAttendanceAnalyticsView from "@/views/AdminAttendanceAnalyticsView";
+import BrandLogo from "@/components/BrandLogo";
 
 interface UserItem {
   id: string;
@@ -890,17 +891,11 @@ export default function AdminPage() {
       {/* LEFT SIDEBAR */}
       <aside className={`admin-sidebar ${isMobileSidebarOpen ? 'open' : ''}`}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", paddingBottom: "1.5rem", borderBottom: "1px solid var(--border-subtle)", marginBottom: "1.5rem" }}>
-            <div style={{ width: "36px", height: "36px", borderRadius: "6px", backgroundColor: "var(--royal-blue)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "800", fontSize: "1.05rem", color: "white", boxShadow: "0 2px 6px rgba(10, 102, 194, 0.3)" }}>
-              in
-            </div>
-            <div>
-              <h2 style={{ fontSize: "1.05rem", fontWeight: "700", margin: 0, letterSpacing: "-0.01em" }}>VM-HUB</h2>
-              <span style={{ fontSize: "0.725rem", color: "var(--royal-blue)", fontWeight: "600" }}>Admin Portal</span>
-            </div>
+          <div style={{ paddingBottom: "1.25rem", borderBottom: "1px solid var(--border-subtle)", marginBottom: "1.25rem" }}>
+            <BrandLogo size="md" subtitle="ADMIN COMMAND CENTER" />
           </div>
 
-          <nav style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+          <nav style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
             {[
               { id: "users", label: "User Accounts", Icon: Users, count: allDisplayUsers.length },
               { id: "depts", label: "Departments", Icon: Building2, count: depts.length },
@@ -935,26 +930,25 @@ export default function AdminPage() {
                     width: "100%",
                     padding: "0.65rem 0.9rem",
                     borderRadius: "6px",
-                    border: "none",
                     cursor: "pointer",
-                    fontWeight: isSelected ? "700" : "600",
+                    fontWeight: isSelected ? "600" : "500",
                     fontSize: "0.85rem",
-                    backgroundColor: isSelected ? "rgba(10, 102, 194, 0.1)" : "transparent",
-                    color: isSelected ? "var(--royal-blue)" : "var(--text-muted)",
-                    borderLeft: isSelected ? "3px solid var(--royal-blue)" : "3px solid transparent",
-                    transition: "all 0.2s ease"
+                    backgroundColor: isSelected ? "var(--primary-subtle)" : "transparent",
+                    color: isSelected ? "var(--primary)" : "var(--text-muted)",
+                    border: isSelected ? "1px solid rgba(37, 99, 235, 0.2)" : "1px solid transparent",
+                    transition: "all 0.16s ease"
                   }}
                 >
                   <span style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
-                    <nav.Icon size={17} style={{ color: isSelected ? "var(--royal-blue)" : "inherit" }} /> {nav.label}
+                    <nav.Icon size={17} style={{ color: isSelected ? "var(--primary)" : "inherit" }} /> {nav.label}
                   </span>
                   <span
                     style={{
-                      fontSize: "0.75rem",
+                      fontSize: "0.72rem",
                       padding: "0.15rem 0.5rem",
                       borderRadius: "9999px",
-                      backgroundColor: isSelected ? "rgba(10, 102, 194, 0.18)" : "var(--border-subtle)",
-                      color: isSelected ? "var(--royal-blue)" : "var(--text-muted)",
+                      backgroundColor: isSelected ? "rgba(37, 99, 235, 0.15)" : "var(--bg-input)",
+                      color: isSelected ? "var(--primary)" : "var(--text-muted)",
                       fontWeight: isSelected ? "700" : "500"
                     }}
                   >
@@ -970,7 +964,6 @@ export default function AdminPage() {
           {/* User Profile Sidebar Card */}
           <div
             onClick={() => {
-              // Find or create current admin user profile to display in drawer
               const currentAdmin = users.find((u) => u.role === "ADMIN") || {
                 id: "admin-self",
                 email: "admin@veltech.edu.in",
@@ -985,15 +978,15 @@ export default function AdminPage() {
               display: "flex",
               alignItems: "center",
               gap: "0.75rem",
-              padding: "0.6rem 0.75rem",
-              borderRadius: "10px",
+              padding: "0.65rem 0.85rem",
+              borderRadius: "var(--radius-sm)",
               backgroundColor: "var(--bg-input)",
               border: "1px solid var(--border-subtle)",
               cursor: "pointer",
-              transition: "all 0.2s ease"
+              transition: "all 0.18s var(--ease-smooth)"
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--sky-blue)";
+              e.currentTarget.style.borderColor = "var(--primary)";
               e.currentTarget.style.transform = "translateY(-1px)";
             }}
             onMouseLeave={(e) => {
@@ -1002,17 +995,17 @@ export default function AdminPage() {
             }}
           >
             <div style={{
-              width: "38px",
-              height: "38px",
+              width: "36px",
+              height: "36px",
               borderRadius: "50%",
-              backgroundColor: "var(--royal-blue)",
+              background: "linear-gradient(135deg, var(--primary) 0%, #6366f1 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontWeight: "700",
               color: "white",
               fontSize: "0.95rem",
-              border: "2px solid rgba(255, 255, 255, 0.2)"
+              boxShadow: "0 2px 6px rgba(37, 99, 235, 0.3)"
             }}>
               A
             </div>
@@ -1027,11 +1020,12 @@ export default function AdminPage() {
             <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>›</span>
           </div>
 
-          <button onClick={toggleTheme} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", width: "100%", backgroundColor: "var(--bg-input)", color: "var(--text-main)", border: "1px solid var(--border-subtle)", padding: "0.6rem", borderRadius: "8px", fontSize: "0.85rem", fontWeight: "600", cursor: "pointer" }}>
-            {theme === "dark" ? <><Sun size={16} /> Light Mode</> : <><Moon size={16} /> Dark Mode</>}
+          <button onClick={toggleTheme} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", width: "100%", backgroundColor: "var(--bg-card)", color: "var(--text-main)", border: "1px solid var(--border-subtle)", padding: "0.55rem", borderRadius: "var(--radius-sm)", fontSize: "0.825rem", fontWeight: "600", cursor: "pointer", transition: "all 0.15s ease" }}>
+            {theme === "dark" ? <><Sun size={15} style={{ color: "#fbbf24" }} /> Switch to Light</> : <><Moon size={15} style={{ color: "#6366f1" }} /> Switch to Dark</>}
           </button>
-          <button onClick={() => signOut({ callbackUrl: "/" })} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", color: "#ef4444", fontSize: "0.85rem", border: "1px solid rgba(239, 68, 68, 0.3)", backgroundColor: "rgba(239, 68, 68, 0.1)", padding: "0.6rem", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}>
-            Sign Out
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="btn-danger" style={{ width: "100%" }}>
+            <LogOut size={15} />
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>

@@ -23,8 +23,19 @@ export default function HodCoursesPage() {
     });
   }, []);
 
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--text-muted)", fontSize: "0.95rem" }}>
+          <div style={{ width: "20px", height: "20px", border: "2px solid var(--border-subtle)", borderTopColor: "var(--primary)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+          <span>Loading course catalog & governance...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: "2rem" }}>
+    <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       <CourseCatalog
         mode="hod"
         department={hodDept}

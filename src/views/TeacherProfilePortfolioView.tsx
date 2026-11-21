@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FiMail, FiHash, FiCheckCircle, FiBook, FiAward, FiEdit2, FiX, FiSave } from "react-icons/fi";
+import { Loader2 } from "lucide-react";
 
 export default function TeacherProfilePage() {
   const [data, setData] = useState<any>(null);
@@ -25,8 +26,8 @@ export default function TeacherProfilePage() {
         if (json.success) {
           setData(json.data);
           setEditName(json.data.name);
-          setEditDepartment(json.data.profile.department);
-          setEditDesignation(json.data.profile.designation);
+          setEditDepartment(json.data.profile?.department || "");
+          setEditDesignation(json.data.profile?.designation || "");
         } else {
           setError(json.error || "Failed to load profile.");
         }
@@ -53,12 +54,12 @@ export default function TeacherProfilePage() {
       const res = await fetch("/api/teacher/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          name: editName, 
+        body: JSON.stringify({
+          name: editName,
           password: editPassword || undefined,
           department: editDepartment,
-          designation: editDesignation
-        })
+          designation: editDesignation,
+        }),
       });
       const json = await res.json();
       if (json.success) {
@@ -79,105 +80,168 @@ export default function TeacherProfilePage() {
 
   if (loading && !data) {
     return (
-      <div className="admin-layout">
-        <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-          <div className="loading-spinner"></div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
+          <Loader2 size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Loading faculty profile...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <main className="student-main">
-      <header className="student-header" style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+    <div>
+      <div
+        style={{
+          marginBottom: "1.75rem",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
         <div>
-          <h1>Your Profile</h1>
-          <p className="student-subtitle">Manage and view your faculty details.</p>
+          <h2 style={{ fontSize: "1.4rem", fontWeight: 800, margin: "0 0 0.25rem 0" }}>Faculty Profile</h2>
+          <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)" }}>
+            Academic credentials, department designation, and verified institutional record.
+          </p>
         </div>
         {!isEditing && (
-          <button 
-            onClick={() => setIsEditing(true)}
-            style={{ display: "flex", alignItems: "center", gap: "0.5rem", padding: "0.6rem 1rem", backgroundColor: "var(--royal-blue)", color: "white", border: "none", borderRadius: "8px", fontWeight: "600", cursor: "pointer" }}
-          >
-            <FiEdit2 /> Edit Profile
+          <button onClick={() => setIsEditing(true)} className="btn-royal">
+            <FiEdit2 /> <span>Edit Profile</span>
           </button>
         )}
-      </header>
+      </div>
 
       {error && (
-        <div style={{ backgroundColor: "rgba(239, 68, 68, 0.1)", color: "#ef4444", padding: "1rem", borderRadius: "8px", marginBottom: "2rem", border: "1px solid #fca5a5" }}>
+        <div
+          style={{
+            backgroundColor: "var(--danger-bg)",
+            color: "var(--danger)",
+            padding: "1rem 1.25rem",
+            borderRadius: "var(--radius-sm)",
+            marginBottom: "1.5rem",
+            border: "1px solid var(--danger-border)",
+            fontSize: "0.875rem",
+          }}
+        >
           {error}
         </div>
       )}
 
       {saveSuccess && (
-        <div style={{ backgroundColor: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "1rem", borderRadius: "8px", marginBottom: "2rem", border: "1px solid #6ee7b7" }}>
+        <div
+          style={{
+            backgroundColor: "var(--success-bg)",
+            color: "var(--success)",
+            padding: "1rem 1.25rem",
+            borderRadius: "var(--radius-sm)",
+            marginBottom: "1.5rem",
+            border: "1px solid var(--success-border)",
+            fontSize: "0.875rem",
+          }}
+        >
           Profile updated successfully!
         </div>
       )}
 
       {isEditing && (
-        <div className="student-card premium-card" style={{ marginBottom: "2rem", border: "2px solid var(--royal-blue)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-            <h3 style={{ margin: 0, color: "var(--text-main)" }}>Edit Profile</h3>
-            <button onClick={() => setIsEditing(false)} style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "1.2rem" }}>
-              <FiX />
+        <div
+          className="student-card premium-card"
+          style={{ marginBottom: "2rem", border: "1px solid var(--primary)", boxShadow: "var(--shadow-elevation)" }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "1.5rem",
+              paddingBottom: "0.75rem",
+              borderBottom: "1px solid var(--border-subtle)",
+            }}
+          >
+            <h3 style={{ margin: 0, color: "var(--text-main)", fontSize: "1.1rem", fontWeight: 700 }}>
+              Edit Faculty Profile Details
+            </h3>
+            <button
+              onClick={() => setIsEditing(false)}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--text-muted)",
+                cursor: "pointer",
+                padding: "4px",
+              }}
+              aria-label="Cancel editing"
+            >
+              <FiX size={18} />
             </button>
           </div>
-          <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+          <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1.25rem" }}>
               <div>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-main)" }}>Full Name</label>
-                <input 
-                  type="text" 
+                <label style={{ display: "block", marginBottom: "0.4rem", fontWeight: "600", fontSize: "0.825rem", color: "var(--text-main)" }}>
+                  Full Name
+                </label>
+                <input
+                  type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-card-header)", color: "var(--text-main)" }}
+                  className="premium-input"
                   required
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-main)" }}>New Password (blank to keep)</label>
-                <input 
-                  type="password" 
+                <label style={{ display: "block", marginBottom: "0.4rem", fontWeight: "600", fontSize: "0.825rem", color: "var(--text-main)" }}>
+                  New Password (blank to keep current)
+                </label>
+                <input
+                  type="password"
                   value={editPassword}
                   onChange={(e) => setEditPassword(e.target.value)}
-                  style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-card-header)", color: "var(--text-main)" }}
+                  className="premium-input"
+                  placeholder="••••••••••••"
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-main)" }}>Department</label>
-                <input 
-                  type="text" 
+                <label style={{ display: "block", marginBottom: "0.4rem", fontWeight: "600", fontSize: "0.825rem", color: "var(--text-main)" }}>
+                  Department
+                </label>
+                <input
+                  type="text"
                   value={editDepartment}
                   onChange={(e) => setEditDepartment(e.target.value)}
-                  style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-card-header)", color: "var(--text-main)" }}
+                  className="premium-input"
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "var(--text-main)" }}>Designation</label>
-                <input 
-                  type="text" 
+                <label style={{ display: "block", marginBottom: "0.4rem", fontWeight: "600", fontSize: "0.825rem", color: "var(--text-main)" }}>
+                  Designation
+                </label>
+                <input
+                  type="text"
                   value={editDesignation}
                   onChange={(e) => setEditDesignation(e.target.value)}
-                  style={{ width: "100%", padding: "0.8rem", borderRadius: "8px", border: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-card-header)", color: "var(--text-main)" }}
+                  className="premium-input"
                 />
               </div>
             </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: "1rem", marginTop: "0.5rem" }}>
-              <button 
-                type="button" 
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", marginTop: "0.5rem" }}>
+              <button
+                type="button"
                 onClick={() => setIsEditing(false)}
-                style={{ padding: "0.8rem 1.5rem", borderRadius: "8px", border: "1px solid var(--border-subtle)", backgroundColor: "transparent", color: "var(--text-muted)", fontWeight: "600", cursor: "pointer" }}
+                className="btn-secondary"
               >
                 Cancel
               </button>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={saveLoading}
-                style={{ padding: "0.8rem 1.5rem", borderRadius: "8px", border: "none", backgroundColor: "var(--royal-blue)", color: "white", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "0.5rem", opacity: saveLoading ? 0.7 : 1 }}
+                className="btn-royal"
+                style={{ opacity: saveLoading ? 0.7 : 1 }}
               >
-                {saveLoading ? "Saving..." : <><FiSave /> Save Changes</>}
+                {saveLoading ? "Saving..." : <><FiSave /> <span>Save Changes</span></>}
               </button>
             </div>
           </form>
@@ -185,154 +249,163 @@ export default function TeacherProfilePage() {
       )}
 
       {data && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem", alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", alignItems: "start" }}>
           {/* Identity Card */}
-          <div className="student-card premium-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "3rem 2rem" }}>
-            <div style={{ 
-              width: "120px", 
-              height: "120px", 
-              borderRadius: "50%", 
-              backgroundColor: "var(--bg-card-header)", 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center",
-              marginBottom: "1.5rem",
-              fontSize: "3rem",
-              color: "var(--royal-blue)",
-              fontWeight: 700
-            }}>
-              {data.name.charAt(0).toUpperCase()}
+          <div
+            className="student-card premium-card"
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "2.5rem 1.75rem" }}
+          >
+            <div
+              style={{
+                width: "96px",
+                height: "96px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, var(--primary) 0%, #06b6d4 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: "1rem",
+                fontSize: "2.4rem",
+                color: "white",
+                fontWeight: 800,
+                boxShadow: "0 8px 24px -4px rgba(37, 99, 235, 0.4)",
+              }}
+            >
+              {data.name?.charAt(0).toUpperCase()}
             </div>
-            <h2 style={{ margin: "0 0 0.5rem 0", fontSize: "1.5rem", color: "var(--text-main)" }}>{data.name}</h2>
-            <p style={{ margin: 0, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <FiMail /> {data.email}
+            <h3 style={{ margin: "0 0 0.25rem 0", fontSize: "1.35rem", fontWeight: 800, color: "var(--text-main)" }}>
+              {data.name}
+            </h3>
+            <p
+              style={{
+                margin: 0,
+                color: "var(--text-muted)",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                fontSize: "0.85rem",
+              }}
+            >
+              <FiMail size={14} /> {data.email}
             </p>
-            
-            <div style={{ marginTop: "2rem", width: "100%", display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "1rem", backgroundColor: "var(--bg-card-header)", borderRadius: "8px" }}>
-                <span style={{ color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.5rem" }}><FiHash /> MTS Number</span>
-                <strong style={{ color: "var(--text-main)" }}>{data.vmNo}</strong>
+
+            <div style={{ marginTop: "1.75rem", width: "100%", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "0.85rem 1rem",
+                  backgroundColor: "var(--bg-input)",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid var(--border-subtle)",
+                }}
+              >
+                <span style={{ color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.825rem" }}>
+                  <FiHash /> MTS ID
+                </span>
+                <strong style={{ color: "var(--text-main)", fontVariantNumeric: "tabular-nums" }}>{data.vmNo}</strong>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "1rem", backgroundColor: "var(--bg-card-header)", borderRadius: "8px" }}>
-                <span style={{ color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.5rem" }}><FiCheckCircle /> Status</span>
-                <strong style={{ color: "#10b981" }}>{data.status}</strong>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "0.85rem 1rem",
+                  backgroundColor: "var(--bg-input)",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid var(--border-subtle)",
+                }}
+              >
+                <span style={{ color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.825rem" }}>
+                  <FiCheckCircle /> Status
+                </span>
+                <strong style={{ color: "#10b981", fontSize: "0.85rem" }}>● {data.status}</strong>
               </div>
             </div>
           </div>
 
-          {/* Academic Info */}
+          {/* Academic Profile Info */}
           <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
             <div className="student-card premium-card">
-              <h3 style={{ margin: "0 0 1.5rem 0", color: "var(--text-main)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <FiBook /> Faculty Information
+              <h3
+                style={{
+                  margin: "0 0 1.25rem 0",
+                  color: "var(--text-main)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                }}
+              >
+                <FiBook size={17} style={{ color: "var(--primary)" }} /> Faculty Assignment Information
               </h3>
-              
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.25rem" }}>
                 <div>
-                  <label style={{ fontSize: "0.85rem", color: "var(--text-muted)", fontWeight: 600 }}>DEPARTMENT</label>
-                  <div style={{ fontSize: "1.1rem", color: "var(--text-main)", fontWeight: 500, marginTop: "0.25rem" }}>{data.profile.department}</div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, letterSpacing: "0.04em" }}>
+                    DEPARTMENT
+                  </label>
+                  <div style={{ fontSize: "1.05rem", color: "var(--text-main)", fontWeight: 600, marginTop: "0.2rem" }}>
+                    Department of {data.profile?.department || "CSE"}
+                  </div>
                 </div>
                 <div>
-                  <label style={{ fontSize: "0.85rem", color: "var(--text-muted)", fontWeight: 600 }}>DESIGNATION</label>
-                  <div style={{ fontSize: "1.1rem", color: "var(--text-main)", fontWeight: 500, marginTop: "0.25rem" }}>{data.profile.designation}</div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, letterSpacing: "0.04em" }}>
+                    DESIGNATION
+                  </label>
+                  <div style={{ fontSize: "1.05rem", color: "var(--text-main)", fontWeight: 600, marginTop: "0.2rem" }}>
+                    {data.profile?.designation || "Assistant Professor"}
+                  </div>
+                </div>
+                <div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, letterSpacing: "0.04em" }}>
+                    SYSTEM ROLE
+                  </label>
+                  <div style={{ fontSize: "1.05rem", color: "var(--primary)", fontWeight: 600, marginTop: "0.2rem" }}>
+                    Faculty / Teacher
+                  </div>
+                </div>
+                <div>
+                  <label style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, letterSpacing: "0.04em" }}>
+                    SECURITY CLEARANCE
+                  </label>
+                  <div style={{ fontSize: "1.05rem", color: "var(--text-main)", fontWeight: 600, marginTop: "0.2rem" }}>
+                    Standard Instructor
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="student-card premium-card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                <h3 style={{ margin: 0, color: "var(--text-main)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <FiBook /> Teaching Assignments
-                </h3>
-                <span style={{ 
-                  fontSize: "0.75rem", 
-                  fontWeight: 600, 
-                  padding: "0.25rem 0.6rem", 
-                  borderRadius: "9999px", 
-                  backgroundColor: "rgba(99, 102, 241, 0.12)", 
-                  color: "var(--royal-blue)",
-                  border: "1px solid rgba(99, 102, 241, 0.25)"
-                }}>
-                  Admin Managed • Read Only
-                </span>
-              </div>
-              <p style={{ margin: "0 0 1.25rem 0", color: "var(--text-muted)", fontSize: "0.8rem" }}>
-                These columns are only visible in teacher mode and are maintained strictly by the administrator. Teachers cannot edit these assignments.
-              </p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                {[
-                  { key: "subject1", label: "Subject 1", value: data.profile.subjects?.subject1 },
-                  { key: "subject2", label: "Subject 2", value: data.profile.subjects?.subject2 },
-                  { key: "lab1", label: "Lab 1", value: data.profile.subjects?.lab1 },
-                  { key: "lab2", label: "Lab 2", value: data.profile.subjects?.lab2 },
-                  { key: "additional1", label: "Additional 1", value: data.profile.subjects?.additional1 },
-                  { key: "additional2", label: "Additional 2", value: data.profile.subjects?.additional2 },
-                ].map(({ key, label, value }) => {
-                  const assignedClasses: string[] = data.profile.subjectClasses?.[key] || [];
-                  return (
-                    <div key={key} style={{ padding: "0.9rem", borderRadius: "8px", backgroundColor: "var(--bg-card-header)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                      <div>
-                        <label style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 600 }}>{label}</label>
-                        <div style={{ marginTop: "0.25rem", color: "var(--text-main)", fontWeight: 600, fontSize: "0.95rem" }}>
-                          {value || "Not assigned"}
-                        </div>
-                      </div>
-                      <div style={{ marginTop: "0.6rem", paddingTop: "0.5rem", borderTop: "1px dashed var(--border-subtle)" }}>
-                        <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", display: "block", marginBottom: "0.25rem" }}>
-                          Assigned Classes:
-                        </span>
-                        {assignedClasses.length > 0 ? (
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
-                            {assignedClasses.map((cls) => (
-                              <span
-                                key={cls}
-                                style={{
-                                  fontSize: "0.72rem",
-                                  fontWeight: 700,
-                                  padding: "0.15rem 0.45rem",
-                                  borderRadius: "4px",
-                                  backgroundColor: "rgba(59, 130, 246, 0.15)",
-                                  color: "var(--royal-blue)",
-                                  border: "1px solid rgba(59, 130, 246, 0.3)",
-                                }}
-                              >
-                                {cls}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontStyle: "italic" }}>
-                            {value ? "No classes scheduled yet" : "—"}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="student-card premium-card" style={{ background: "linear-gradient(135deg, var(--royal-blue) 0%, #3b82f6 100%)", color: "white", border: "none" }}>
-              <h3 style={{ margin: "0 0 1.5rem 0", display: "flex", alignItems: "center", gap: "0.5rem", color: "white" }}>
-                <FiAward /> Highlights
+            {/* Performance Overview Banner */}
+            <div
+              className="student-card premium-card"
+              style={{
+                background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #06b6d4 100%)",
+                color: "white",
+                border: "none",
+                boxShadow: "0 10px 25px -5px rgba(37, 99, 235, 0.4)",
+              }}
+            >
+              <h3 style={{ margin: "0 0 1.25rem 0", display: "flex", alignItems: "center", gap: "0.5rem", color: "white", fontSize: "1.1rem" }}>
+                <FiAward size={18} /> Instructional Activity
               </h3>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontSize: "0.9rem", opacity: 0.9 }}>Classes Today</div>
-                  <div style={{ fontSize: "2rem", fontWeight: 700, marginTop: "0.25rem" }}>--</div>
+                  <div style={{ fontSize: "0.825rem", opacity: 0.85, fontWeight: 500 }}>Active Classes</div>
+                  <div style={{ fontSize: "2rem", fontWeight: 800, marginTop: "0.25rem", letterSpacing: "-0.02em" }}>Daily</div>
                 </div>
-                <div>
-                  <div style={{ fontSize: "0.9rem", opacity: 0.9 }}>Total Students</div>
-                  <div style={{ fontSize: "2rem", fontWeight: 700, marginTop: "0.25rem" }}>--</div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: "0.825rem", opacity: 0.85, fontWeight: 500 }}>Attendance Marked</div>
+                  <div style={{ fontSize: "2rem", fontWeight: 800, marginTop: "0.25rem", letterSpacing: "-0.02em" }}>Active</div>
                 </div>
               </div>
-              <div style={{ marginTop: "1.5rem", fontSize: "0.85rem", opacity: 0.8 }}>
-                * Metrics will be synced automatically based on your assigned timetable.
+              <div style={{ marginTop: "1.25rem", fontSize: "0.78rem", opacity: 0.75, borderTop: "1px solid rgba(255, 255, 255, 0.15)", paddingTop: "0.75rem" }}>
+                Vel Tech Multi Tech Autonomous ERP • Verified Staff Credentials
               </div>
             </div>
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }

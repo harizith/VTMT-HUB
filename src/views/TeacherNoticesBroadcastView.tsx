@@ -136,9 +136,10 @@ export default function TeacherNoticesPage() {
 
   if (loading) {
     return (
-      <div className="admin-layout">
-        <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem" }}>
           <div className="loading-spinner"></div>
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem" }}>Loading broadcasts...</p>
         </div>
       </div>
     );
@@ -171,7 +172,7 @@ export default function TeacherNoticesPage() {
   });
 
   return (
-    <main className="student-main">
+    <div>
       <header className="student-header" style={{ marginBottom: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
@@ -427,6 +428,6 @@ export default function TeacherNoticesPage() {
           })
         )}
       </div>
-    </main>
+    </div>
   );
 }
