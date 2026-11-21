@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { signIn } from "next-auth/react";
-import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, Loader2, Sparkles, User, ShieldCheck } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertCircle, ArrowRight, Loader2, User } from "lucide-react";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -11,12 +11,13 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const executeSignIn = async (inputIdentifier: string, inputPass: string) => {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     setErrorMsg("");
 
-    let targetEmail = inputIdentifier.trim().toLowerCase();
-    const targetPassword = inputPass.trim();
+    let targetEmail = email.trim().toLowerCase();
+    const targetPassword = password.trim();
 
     // Friendly alias mappings
     if (targetEmail === "student") {
@@ -63,149 +64,27 @@ export default function LoginForm() {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    await executeSignIn(email, password);
-  };
-
-  // Quick 1-click login helper
-  const handleQuickLogin = (quickId: string, quickPass: string) => {
-    setEmail(quickId);
-    setPassword(quickPass);
-    executeSignIn(quickId, quickPass);
-  };
-
   return (
     <div className="auth-card">
-      <div style={{ marginBottom: "1.25rem" }}>
+      <div style={{ marginBottom: "1.5rem" }}>
         <h1 style={{ fontSize: "1.65rem", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 0.35rem 0", color: "var(--text-main)" }}>
           Sign in
         </h1>
         <p className="auth-sub" style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)" }}>
-          Enter your college email or roll number to continue.
+          Use your institutional college credentials to continue.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="auth-error" role="alert" style={{ marginBottom: "1rem" }}>
+        <div className="auth-error" role="alert" style={{ marginBottom: "1.25rem" }}>
           <AlertCircle size={18} style={{ flexShrink: 0 }} />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      {/* Quick 1-Click Role Fillers */}
-      <div style={{
-        marginBottom: "1.25rem",
-        padding: "0.75rem",
-        borderRadius: "12px",
-        backgroundColor: "var(--bg-input)",
-        border: "1px solid var(--border-subtle)"
-      }}>
-        <div style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--text-muted)", letterSpacing: "0.05em", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.3rem" }}>
-          <Sparkles size={12} style={{ color: "var(--primary)" }} /> QUICK ACCESS DEMO LOGINS
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.45rem" }}>
-          <button
-            type="button"
-            onClick={() => handleQuickLogin("student@vtmt.org", "student123")}
-            disabled={isLoading}
-            style={{
-              padding: "0.45rem 0.6rem",
-              borderRadius: "8px",
-              border: "1px solid var(--border-subtle)",
-              backgroundColor: "var(--bg-card)",
-              color: "var(--text-main)",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              cursor: "pointer",
-              textAlign: "left",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              transition: "all 0.15s ease"
-            }}
-          >
-            <span>🎓 Student</span>
-            <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 800 }}>Fill & Go →</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleQuickLogin("admin@vtmt.org", "administrator")}
-            disabled={isLoading}
-            style={{
-              padding: "0.45rem 0.6rem",
-              borderRadius: "8px",
-              border: "1px solid var(--border-subtle)",
-              backgroundColor: "var(--bg-card)",
-              color: "var(--text-main)",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              cursor: "pointer",
-              textAlign: "left",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              transition: "all 0.15s ease"
-            }}
-          >
-            <span>⚙️ Admin</span>
-            <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 800 }}>Fill & Go →</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleQuickLogin("teacher@vtmt.org", "teacher123")}
-            disabled={isLoading}
-            style={{
-              padding: "0.45rem 0.6rem",
-              borderRadius: "8px",
-              border: "1px solid var(--border-subtle)",
-              backgroundColor: "var(--bg-card)",
-              color: "var(--text-main)",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              cursor: "pointer",
-              textAlign: "left",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              transition: "all 0.15s ease"
-            }}
-          >
-            <span>👨‍🏫 Faculty</span>
-            <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 800 }}>Fill & Go →</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleQuickLogin("hod@vtmt.org", "hod123")}
-            disabled={isLoading}
-            style={{
-              padding: "0.45rem 0.6rem",
-              borderRadius: "8px",
-              border: "1px solid var(--border-subtle)",
-              backgroundColor: "var(--bg-card)",
-              color: "var(--text-main)",
-              fontSize: "0.75rem",
-              fontWeight: 700,
-              cursor: "pointer",
-              textAlign: "left",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              transition: "all 0.15s ease"
-            }}
-          >
-            <span>🏛️ HOD</span>
-            <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 800 }}>Fill & Go →</span>
-          </button>
-        </div>
-      </div>
-
       <form onSubmit={handleSubmit}>
-        <div className="auth-field" style={{ marginBottom: "1rem" }}>
-          <label htmlFor="email" style={{ fontSize: "0.82rem", fontWeight: 700, marginBottom: "0.35rem", display: "block", color: "var(--text-main)" }}>
+        <div className="auth-field" style={{ marginBottom: "1.25rem" }}>
+          <label htmlFor="email" style={{ fontSize: "0.82rem", fontWeight: 700, marginBottom: "0.4rem", display: "block", color: "var(--text-main)" }}>
             College Email or Roll Number
           </label>
           <div className="auth-input-wrap">
@@ -214,7 +93,7 @@ export default function LoginForm() {
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="student@vtmt.org or 23CS101"
+              placeholder="name@veltechmultitech.org or Roll No"
               className="auth-input"
               style={{ paddingLeft: "38px" }}
               required
@@ -232,8 +111,8 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <div className="auth-field" style={{ marginBottom: "1.25rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.35rem" }}>
+        <div className="auth-field" style={{ marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.4rem" }}>
             <label htmlFor="password" style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--text-main)" }}>
               Password
             </label>
@@ -271,7 +150,7 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <button type="submit" className="auth-submit" disabled={isLoading} style={{ width: "100%", padding: "0.75rem", borderRadius: "10px", fontWeight: 800 }}>
+        <button type="submit" className="auth-submit" disabled={isLoading} style={{ width: "100%", padding: "0.8rem", borderRadius: "10px", fontWeight: 800 }}>
           {isLoading ? (
             <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
               <Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} />
@@ -286,7 +165,7 @@ export default function LoginForm() {
         </button>
       </form>
 
-      <p className="auth-help" style={{ fontSize: "0.78rem", color: "var(--text-muted)", textAlign: "center", marginTop: "1.25rem" }}>
+      <p className="auth-help" style={{ fontSize: "0.78rem", color: "var(--text-muted)", textAlign: "center", marginTop: "1.5rem" }}>
         Vel Tech Multi Tech Autonomous Portal • Secured Session
       </p>
     </div>
