@@ -36,12 +36,15 @@ class InMemoryStore {
     ];
 
     // 2. Secret Admin Account & Student Test Account
+    const defaultPasswordHash = "$2a$10$wK1Ww8zJ0q6bH5yN.Gj2A.6sXG.u/9f8c6jR7m5g2L0p1y3x4z5a6";
+    const demoPassword = process.env.DEMO_USER_PASSWORD || "sample_demo_pwd";
+
     const secretAdmin = {
       id: "admin-secret-root",
       vmNo: "ADM-SECRET-01",
-      email: "admin@vtmt.org",
+      email: "admin@example.internal",
       name: "System Administrator",
-      password: "$2a$10$wK1Ww8zJ0q6bH5yN.Gj2A.6sXG.u/9f8c6jR7m5g2L0p1y3x4z5a6", // administrator
+      password: defaultPasswordHash,
       role: "ADMIN",
       status: "ACTIVE",
       createdAt: new Date(),
@@ -51,9 +54,9 @@ class InMemoryStore {
     const studentUser = {
       id: "stu-vtmt-23cs101",
       vmNo: "23CS101",
-      email: "student@vtmt.org",
+      email: "student@example.internal",
       name: "Vasanth Kumar R",
-      password: "$2a$10$wK1Ww8zJ0q6bH5yN.Gj2A.6sXG.u/9f8c6jR7m5g2L0p1y3x4z5a6", // student123
+      password: defaultPasswordHash,
       role: "STUDENT",
       status: "ACTIVE",
       createdAt: new Date(),
@@ -63,9 +66,9 @@ class InMemoryStore {
     const teacherUser = {
       id: "fac-vtmt-emp01",
       vmNo: "EMP-CSE-001",
-      email: "teacher@vtmt.org",
+      email: "teacher@example.internal",
       name: "Dr. Saravanan",
-      password: "teacher123",
+      password: demoPassword,
       role: "TEACHER",
       status: "ACTIVE",
       createdAt: new Date(),
@@ -75,9 +78,9 @@ class InMemoryStore {
     const hodUser = {
       id: "hod-vtmt-cse",
       vmNo: "HOD-CSE-01",
-      email: "hod@vtmt.org",
+      email: "hod@example.internal",
       name: "Dr. Saravanan (HOD)",
-      password: "hod123",
+      password: demoPassword,
       role: "HOD",
       status: "ACTIVE",
       createdAt: new Date(),
@@ -86,14 +89,14 @@ class InMemoryStore {
 
     this.users = [secretAdmin, studentUser, teacherUser, hodUser];
     this.userModes = [
-      { vmno: "ADM-SECRET-01", emailid: "admin@vtmt.org", password: "administrator", usermode: "ADMIN", createdAt: new Date() },
-      { vmno: "23CS101", emailid: "student@vtmt.org", password: "student123", usermode: "STUDENT", createdAt: new Date() },
-      { vmno: "EMP-CSE-001", emailid: "teacher@vtmt.org", password: "teacher123", usermode: "TEACHER", createdAt: new Date() },
-      { vmno: "HOD-CSE-01", emailid: "hod@vtmt.org", password: "hod123", usermode: "HOD", createdAt: new Date() },
+      { vmno: "ADM-SECRET-01", emailid: "admin@example.internal", password: demoPassword, usermode: "ADMIN", createdAt: new Date() },
+      { vmno: "23CS101", emailid: "student@example.internal", password: demoPassword, usermode: "STUDENT", createdAt: new Date() },
+      { vmno: "EMP-CSE-001", emailid: "teacher@example.internal", password: demoPassword, usermode: "TEACHER", createdAt: new Date() },
+      { vmno: "HOD-CSE-01", emailid: "hod@example.internal", password: demoPassword, usermode: "HOD", createdAt: new Date() },
     ];
     this.studentProfiles = [
       {
-        userEmail: "student@vtmt.org",
+        userEmail: "student@example.internal",
         rollNumber: "23CS101",
         department: "CSE",
         semester: 3,
@@ -105,7 +108,7 @@ class InMemoryStore {
     ];
     this.facultyProfiles = [
       {
-        userEmail: "teacher@vtmt.org",
+        userEmail: "teacher@example.internal",
         department: "CSE",
         designation: "Associate Professor",
         cabin: "N-201",
@@ -114,7 +117,7 @@ class InMemoryStore {
     ];
     this.hodProfiles = [
       {
-        userEmail: "hod@vtmt.org",
+        userEmail: "hod@example.internal",
         department: "CSE",
         designation: "Head of Department",
         cabin: "HOD-CSE-Cabin",
