@@ -276,9 +276,11 @@ export async function POST(request: Request) {
 
     const stripTitlesAndDegrees = (name: string) =>
       name
-        .replace(/,\s*ph\.?d/gi, '')
-        .replace(/\bph\.?d\b/gi, '')
-        .replace(/\b(dr|prof|professor|mr|ms|mrs|shri|smt)\b[\.\s]*/gi, '')
+        .replace(/\([^)]*\)/g, ' ')
+        .replace(/\b(ph\.?d|m\.?e|m\.?tech|m\.?sc|m\.?phil|b\.?e|b\.?tech|mba|mca)\b\.?/gi, ' ')
+        .replace(/\b(dr|prof|professor|asst|assoc|mr|ms|mrs|miss|shri|smt|er|sir|madam)\b[\.\s]*/gi, ' ')
+        .replace(/[,]+/g, ' ')
+        .replace(/\s+/g, ' ')
         .trim();
 
     const normalizeStaffName = (name: string) =>

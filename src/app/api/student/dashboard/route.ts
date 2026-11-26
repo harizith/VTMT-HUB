@@ -90,6 +90,31 @@ export async function GET(request: Request) {
       });
       // Sort today's timetable by period
       timetable.sort((a, b) => a.period - b.period);
+
+      // Apply accepted single-day substitute overrides for today only
+      const todayDateString = new Date().toISOString().slice(0, 10);
+      if (classAliases.length && currentDayOrder) {
+        const acceptedSubs = await prisma.substituteRequest.findMany({
+          where: {
+            classId: { in: classAliases },
+            dateString: todayDateString,
+            dayOrder: currentDayOrder,
+            status: "ACCEPTED",
+          },
+        });
+        if (acceptedSubs.length > 0) {
+          timetable = timetable.map((entry: any) => {
+            const sub = acceptedSubs.find((s) => s.period === entry.period);
+            if (!sub) return entry;
+            return {
+              ...entry,
+              facultyName: `${sub.substituteName} (Substitute)`,
+              isSubstitute: true,
+              originalFacultyName: entry.facultyName,
+            };
+          });
+        }
+      }
     } catch (e) {
       console.error("Could not fetch timetable entries via prisma client", e);
     }

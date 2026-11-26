@@ -102,6 +102,13 @@ export default function HodCommandLayout({ children }: HodCommandLayoutProps) {
       Icon: CheckCircle2,
     },
     {
+      id: "student-attendance",
+      href: "/hod/student-attendance",
+      label: "Student Attendance",
+      subLabel: "Dept Attendance %",
+      Icon: GraduationCap,
+    },
+    {
       id: "notices",
       href: "/hod/notices",
       label: "Announcements",

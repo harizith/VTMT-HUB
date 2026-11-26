@@ -195,3 +195,27 @@ model Attendance {
   @@index([classId, dateString])
 }
 
+model SubstituteRequest {
+  id              String   @id @default(uuid())
+  requesterId     String
+  requesterName   String
+  requesterVmNo   String?
+  substituteId    String
+  substituteName  String
+  substituteVmNo  String?
+  classId         String
+  subjectCode     String
+  subjectName     String?
+  dateString      String   // e.g., "2026-11-27" — applies only to this specific date
+  dayOrder        String   // e.g., "I", "II", "III", "IV", "V"
+  period          Int
+  status          String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  reason          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([requesterId])
+  @@index([substituteId])
+  @@index([classId, dateString])
+}
+

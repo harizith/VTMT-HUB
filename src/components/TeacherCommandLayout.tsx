@@ -95,6 +95,13 @@ export default function TeacherCommandLayout({ children }: TeacherCommandLayoutP
       Icon: Users,
     },
     {
+      id: "substitute",
+      href: "/teacher/substitute",
+      label: "Substitute Requests",
+      subLabel: "Single-Day Class Cover",
+      Icon: CheckCircle2,
+    },
+    {
       id: "notices",
       href: "/teacher/notices",
       label: "Announcements & Circulars",

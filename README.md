@@ -68,3 +68,11 @@ Designed for governance, user provisioning, security, and institutional settings
 - **Responsive, Adaptive Layout**: Clean desktop workstation experience for faculty/admins paired with an intuitive mobile/tablet interface for students on the move.
 - **Enterprise-Grade Access Security**: Strict credential encryption, session management, and granular permission boundaries preventing unauthorized data access across roles or departments.
 - **Consistent Visual Language**: A clean, distraction-free LinkedIn-inspired aesthetic (neutral grays, crisp card surfaces, and accessible blue accents) designed for high usability and low cognitive fatigue.
+
+---
+
+## 4. Contributors
+
+- [@harizith](https://github.com/harizith)
+- [@rohit007-coder](https://github.com/rohit007-coder)
+
